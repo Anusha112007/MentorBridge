@@ -204,9 +204,6 @@
                     <option value="2">2nd Year</option>
                     <option value="3">3rd Year</option>
                     <option value="4">4th Year</option>
-                    <option value="2024">Batch 2024</option>
-                    <option value="2023">Batch 2023</option>
-                    <option value="2022">Batch 2022</option>
                   </select>
                 </div>
               </div>
@@ -266,18 +263,29 @@
           const label = document.getElementById('year-label');
           if (!label) return;
           if (card.dataset.role === 'senior') {
-            label.textContent = 'Graduation Year';
+            label.textContent = 'Year / Batch';
             const sel = document.getElementById('reg-year');
             if (sel) {
               sel.innerHTML =
-                '<option value="2024">2024</option><option value="2023">2023</option><option value="2022">2022</option><option value="2021">2021</option>';
+                '<option value="2">2nd Year</option>' +
+                '<option value="3">3rd Year</option>' +
+                '<option value="4">4th Year</option>' +
+                '<option disabled style="color:var(--text-muted);font-size:12px">── Graduated ──</option>' +
+                '<option value="2026">Batch 2026</option>' +
+                '<option value="2025">Batch 2025</option>' +
+                '<option value="2024">Batch 2024</option>' +
+                '<option value="2023">Batch 2023</option>' +
+                '<option value="2022">Batch 2022</option>';
             }
           } else {
             label.textContent = 'Current Year';
             const sel = document.getElementById('reg-year');
             if (sel) {
               sel.innerHTML =
-                '<option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option>';
+                '<option value="1">1st Year</option>' +
+                '<option value="2">2nd Year</option>' +
+                '<option value="3">3rd Year</option>' +
+                '<option value="4">4th Year</option>';
             }
           }
         });

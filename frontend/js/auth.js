@@ -102,8 +102,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const body = { name, email, password, role: selectedRole, branch };
-    if (selectedRole === 'junior') body.currentYear = Number(year) || 1;
-    if (selectedRole === 'senior') body.graduationYear = Number(year) || new Date().getFullYear();
+    if (selectedRole === 'junior') {
+      body.currentYear = Number(year) || 1;
+    }
+    if (selectedRole === 'senior') {
+      const yearVal = Number(year) || 0;
+      // Values 2, 3, 4 = currently studying senior (2nd/3rd/4th year)
+      if (yearVal >= 2 && yearVal <= 4) {
+        body.currentYear = yearVal;
+      } else {
+        // 4-digit batch year (e.g. 2022–2026) = graduated/graduating alumni
+        body.graduationYear = yearVal || new Date().getFullYear();
+      }
+    }
 
     btn.disabled = true;
     btn.textContent = 'Creating account...';
