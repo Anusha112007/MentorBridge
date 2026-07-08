@@ -1,0 +1,216 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Question — MentorBridge</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/directory.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content" style="max-width: 860px">
+        <div class="page-breadcrumb animate-fade-in"><a href="forum.html">← Forum</a></div>
+
+        <!-- Question -->
+        <div id="question-container" class="animate-fade-in">
+          <div class="card" style="margin-bottom: 16px">
+            <div class="skeleton skeleton-title" style="margin-bottom: 8px"></div>
+            <div class="skeleton skeleton-text"></div>
+          </div>
+        </div>
+
+        <!-- Answers -->
+        <div id="answers-section" style="display: none">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin: 24px 0 16px;
+            "
+          >
+            <h3 id="answers-heading" style="font-size: 16px; font-weight: 700">Answers</h3>
+          </div>
+          <div id="answers-list" style="display: flex; flex-direction: column; gap: 12px"></div>
+        </div>
+
+        <!-- Post Answer -->
+        <div id="answer-form" class="card animate-fade-in" style="margin-top: 24px; display: none">
+          <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 16px">✍️ Your Answer</h3>
+          <div class="form-group" style="margin-bottom: 16px">
+            <textarea
+              class="form-textarea"
+              id="answer-body"
+              rows="6"
+              placeholder="Write a detailed, helpful answer. Markdown formatting is supported..."
+            ></textarea>
+          </div>
+          <button class="btn btn-primary" id="submit-answer">Post Answer →</button>
+        </div>
+      </main>
+    </div>
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        const user = requireAuth();
+        if (!user) return;
+        renderNavbar();
+        renderSidebar(user.role);
+
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (!id) {
+          location.href = 'forum.html';
+          return;
+        }
+
+        try {
+          const data = await api.get(`/questions/${id}`);
+          const q = data.question;
+          document.title = `${q.title} | MentorBridge`;
+
+          const author = q.isAnonymous ? { name: 'Anonymous' } : q.author;
+          const upvoteCount = q.upvotes?.length || 0;
+          const isUpvoted = q.upvotes?.includes(user._id);
+
+          const qContainer = document.getElementById('question-container');
+          qContainer.innerHTML = `
+    <div class="card">
+      <div style="display:flex;gap:16px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0">
+          <button class="vote-btn ${isUpvoted ? 'voted' : ''}" id="q-upvote" onclick="upvoteQuestion('${q._id}')">▲</button>
+          <div class="vote-count" id="q-upvote-count">${upvoteCount}</div>
+          <div class="vote-label">votes</div>
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <span class="badge badge-${q.category === 'placement' ? 'success' : q.category === 'career' ? 'secondary' : 'primary'}">${q.category}</span>
+            ${(q.tags || []).map((t) => `<span class="tag">${t}</span>`).join('')}
+          </div>
+          <h1 style="font-size:1.4rem;font-weight:800;margin-bottom:12px;line-height:1.3">${q.title}</h1>
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.8;white-space:pre-wrap">${q.body}</p>
+          <div style="display:flex;align-items:center;gap:16px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border-subtle);font-size:12px;color:var(--text-muted)">
+            <div style="display:flex;align-items:center;gap:6px">
+              ${q.isAnonymous ? '🎭 Anonymous' : renderAvatar(author, 'avatar-sm') + ` ${author?.name}`}
+            </div>
+            <span>👁️ ${q.views} views</span>
+            <span>💬 ${q.answers?.length || 0} answers</span>
+            <span>${timeAgo(q.createdAt)}</span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+          // Answers
+          const answers = q.answers || [];
+          const answersSection = document.getElementById('answers-section');
+          const answersList = document.getElementById('answers-list');
+          const answersHeading = document.getElementById('answers-heading');
+          answersSection.style.display = 'block';
+          answersHeading.textContent = `${answers.length} Answer${answers.length !== 1 ? 's' : ''}`;
+
+          if (!answers.length) {
+            answersList.innerHTML = `<div class="empty-state" style="padding:24px"><div class="empty-state-icon" style="font-size:2rem">💬</div><h3>No answers yet</h3><p>Be the first to answer!</p></div>`;
+          } else {
+            // Sort accepted first
+            const sorted = [...answers].sort(
+              (a, b) => (b.isAccepted ? 1 : 0) - (a.isAccepted ? 1 : 0)
+            );
+            answersList.innerHTML = sorted
+              .map((a) => {
+                const aUpvotes = a.upvotes?.length || 0;
+                const aUpvoted = a.upvotes?.includes(user._id);
+                const isAuthor = q.author?._id === user._id;
+                return `
+        <div class="answer-card ${a.isAccepted ? 'accepted' : ''}" id="ans-${a._id}">
+          ${a.isAccepted ? `<div class="accepted-badge">✅ Accepted Answer</div>` : ''}
+          <div style="display:flex;gap:16px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0">
+              <button class="vote-btn ${aUpvoted ? 'voted' : ''}" onclick="upvoteAnswer('${a._id}', this)">▲</button>
+              <div class="vote-count" style="font-size:16px">${aUpvotes}</div>
+              ${isAuthor && !q.acceptedAnswer ? `<button onclick="acceptAnswer('${a._id}')" title="Accept this answer" style="background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--text-muted)" class="vote-btn">✓</button>` : ''}
+            </div>
+            <div style="flex:1">
+              <div class="answer-body">${a.body}</div>
+              <div class="answer-footer">
+                <div style="display:flex;align-items:center;gap:8px">
+                  ${renderAvatar(a.author, 'avatar-sm')}
+                  <div style="font-size:12px">
+                    <div style="font-weight:600">${a.author?.name}</div>
+                    <div style="color:var(--text-muted)">${timeAgo(a.createdAt)}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+              })
+              .join('');
+          }
+
+          document.getElementById('answer-form').style.display = 'block';
+          document.getElementById('submit-answer')?.addEventListener('click', async () => {
+            const body = document.getElementById('answer-body').value.trim();
+            if (!body) {
+              showToast('warning', 'Write your answer first');
+              return;
+            }
+            const btn = document.getElementById('submit-answer');
+            btn.disabled = true;
+            btn.textContent = 'Posting...';
+            try {
+              await api.post(`/questions/${id}/answers`, { body });
+              showToast('success', 'Answer posted! 🎉');
+              setTimeout(() => location.reload(), 800);
+            } catch (err) {
+              showToast('error', 'Failed', err.message);
+            }
+            btn.disabled = false;
+            btn.textContent = 'Post Answer →';
+          });
+        } catch (err) {
+          document.getElementById('question-container').innerHTML =
+            `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3><a href="forum.html" class="btn btn-primary btn-sm" style="margin-top:12px">Back to Forum</a></div>`;
+        }
+
+        async function upvoteQuestion(qid) {
+          try {
+            const data = await api.put(`/questions/${qid}/upvote`, {});
+            document.getElementById('q-upvote-count').textContent = data.upvotes;
+            document.getElementById('q-upvote').classList.toggle('voted');
+          } catch (err) {
+            showToast('error', 'Failed', err.message);
+          }
+        }
+        window.upvoteQuestion = upvoteQuestion;
+
+        async function upvoteAnswer(aid, btn) {
+          try {
+            const data = await api.put(`/questions/answers/${aid}/upvote`, {});
+            btn.nextElementSibling.textContent = data.upvotes;
+            btn.classList.toggle('voted');
+          } catch (err) {
+            showToast('error', 'Failed', err.message);
+          }
+        }
+        window.upvoteAnswer = upvoteAnswer;
+
+        async function acceptAnswer(aid) {
+          try {
+            await api.put(`/questions/answers/${aid}/accept`, {});
+            showToast('success', '✅ Answer accepted!');
+            setTimeout(() => location.reload(), 600);
+          } catch (err) {
+            showToast('error', 'Failed', err.message);
+          }
+        }
+        window.acceptAnswer = acceptAnswer;
+      });
+    </script>
+  </body>
+</html>

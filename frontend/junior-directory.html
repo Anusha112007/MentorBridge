@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Juniors — MentorBridge</title>
+    <meta
+      name="description"
+      content="Find and recruit junior students for hackathons, projects, and team events. Filter by branch, year, skills, and interests."
+    />
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/directory.css" />
+    <style>
+      .junior-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-5);
+      }
+      .junior-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-xl);
+        padding: var(--space-6);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+        transition: all var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+      .junior-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--gradient-primary);
+        opacity: 0;
+        transition: opacity var(--transition);
+      }
+      .junior-card:hover {
+        border-color: var(--primary);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-card), var(--shadow-glow-sm);
+      }
+      .junior-card:hover::before {
+        opacity: 1;
+      }
+      .junior-card-top {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-4);
+      }
+      .junior-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .junior-name {
+        font-weight: 700;
+        font-size: var(--text-base);
+        color: var(--text-primary);
+      }
+      .junior-branch {
+        font-size: var(--text-xs);
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+      .junior-year {
+        font-size: var(--text-xs);
+        color: var(--primary-light);
+        margin-top: 2px;
+        font-weight: 600;
+      }
+      .junior-bio {
+        font-size: var(--text-sm);
+        color: var(--text-secondary);
+        line-height: 1.6;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .junior-skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+      }
+      .junior-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--border-subtle);
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      /* Invite modal */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s;
+      }
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-2xl);
+        padding: var(--space-8);
+        width: 100%;
+        max-width: 480px;
+        box-shadow: var(--shadow-card);
+        transform: translateY(20px);
+        transition: transform 0.25s;
+      }
+      .modal-overlay.open .modal-box {
+        transform: translateY(0);
+      }
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-6);
+      }
+      .modal-title {
+        font-size: var(--text-xl);
+        font-weight: 700;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 1.4rem;
+        padding: 4px;
+        border-radius: var(--radius-md);
+        transition: background var(--transition);
+      }
+      .modal-close:hover {
+        background: var(--bg-elevated);
+        color: var(--text-primary);
+      }
+      .modal-recipient {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3) var(--space-4);
+        background: var(--bg-elevated);
+        border-radius: var(--radius-lg);
+        margin-bottom: var(--space-5);
+      }
+      .modal-recipient-name {
+        font-weight: 600;
+        font-size: var(--text-sm);
+      }
+      .modal-recipient-sub {
+        font-size: var(--text-xs);
+        color: var(--text-muted);
+      }
+
+      @media (max-width: 1024px) {
+        .junior-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 768px) {
+        .junior-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div class="page-header animate-fade-in">
+          <h1>🎓 Find Junior Teammates</h1>
+          <p>Recruit talented juniors for hackathons, projects, and team events</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="card animate-fade-in" style="margin-bottom: 20px">
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr repeat(4, auto) auto;
+              gap: 12px;
+              align-items: end;
+              flex-wrap: wrap;
+            "
+          >
+            <div class="search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input
+                class="search-input"
+                type="text"
+                id="search-input"
+                placeholder="Search by name, skill, interest..."
+              />
+            </div>
+            <div class="form-group" style="min-width: 130px; display: none">
+              <label class="form-label">Branch</label>
+              <input class="form-input" type="text" id="branch-filter" placeholder="e.g. CSE" />
+            </div>
+            <div class="form-group" style="min-width: 110px">
+              <label class="form-label">Year</label>
+              <select class="form-input" id="year-filter" style="cursor: pointer">
+                <option value="">All Years</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+            </div>
+            <div class="form-group" style="min-width: 130px">
+              <label class="form-label">Skill</label>
+              <input class="form-input" type="text" id="skill-filter" placeholder="e.g. Python" />
+            </div>
+            <div class="form-group" style="min-width: 130px">
+              <label class="form-label">Interest</label>
+              <input class="form-input" type="text" id="interest-filter" placeholder="e.g. AI/ML" />
+            </div>
+            <button
+              class="btn btn-secondary btn-sm"
+              id="clear-filters"
+              style="align-self: flex-end; height: 42px"
+            >
+              ✕ Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick filters -->
+        <div
+          style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px"
+          class="animate-fade-in delay-100"
+        >
+          <span style="font-size: 13px; color: var(--text-muted); align-self: center">Quick:</span>
+          <button class="tag" onclick="quickFilter('skill', 'Python')">🐍 Python</button>
+          <button class="tag" onclick="quickFilter('skill', 'React')">⚛️ React</button>
+          <button class="tag" onclick="quickFilter('skill', 'ML')">🤖 ML</button>
+          <button class="tag" onclick="quickFilter('interest', 'Hackathon')">🏆 Hackathons</button>
+          <button class="tag" onclick="quickFilter('interest', 'Web Development')">
+            🌐 Web Dev
+          </button>
+          <button class="tag" onclick="quickFilter('interest', 'AI')">🧠 AI/ML</button>
+          <button class="tag" onclick="quickFilter('year', '1')">🌱 1st Year</button>
+          <button class="tag" onclick="quickFilter('year', '2')">📗 2nd Year</button>
+        </div>
+
+        <!-- Results header -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+          "
+          class="animate-fade-in delay-100"
+        >
+          <p style="color: var(--text-muted); font-size: 13px">
+            <span id="total-count">—</span> juniors found
+          </p>
+        </div>
+
+        <!-- Grid -->
+        <div class="junior-grid animate-fade-in delay-200" id="juniors-grid"></div>
+        <div id="pagination"></div>
+      </main>
+    </div>
+
+    <!-- Invite Modal -->
+    <div class="modal-overlay" id="invite-modal">
+      <div class="modal-box">
+        <div class="modal-header">
+          <div class="modal-title">🚀 Invite to Team / Event</div>
+          <button class="modal-close" id="modal-close-btn">✕</button>
+        </div>
+        <div class="modal-recipient" id="modal-recipient">
+          <!-- Populated by JS -->
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <div class="form-group">
+            <label class="form-label">Event / Project Name *</label>
+            <input
+              class="form-input"
+              type="text"
+              id="invite-event"
+              placeholder="e.g. Smart India Hackathon 2026"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Role / Position Needed *</label>
+            <input
+              class="form-input"
+              type="text"
+              id="invite-role"
+              placeholder="e.g. Frontend Dev, ML Engineer"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Additional Message</label>
+            <textarea
+              class="form-textarea"
+              id="invite-message"
+              rows="3"
+              placeholder="Tell them more about the opportunity..."
+            ></textarea>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 4px">
+            <button class="btn btn-primary btn-full" id="invite-send-btn">
+              📨 Send Invitation
+            </button>
+            <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script src="js/junior-directory.js"></script>
+    <script>
+      function quickFilter(type, value) {
+        const map = { skill: 'skill-filter', interest: 'interest-filter', year: 'year-filter' };
+        const el = document.getElementById(map[type]);
+        if (el) {
+          el.value = value;
+          el.dispatchEvent(new Event('input'));
+        }
+      }
+    </script>
+  </body>
+</html>

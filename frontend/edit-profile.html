@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile — MentorBridge</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div class="page-header animate-fade-in">
+          <h1>✏️ Edit Profile</h1>
+          <p>Keep your profile updated so juniors and seniors can find you better</p>
+        </div>
+
+        <div style="max-width: 720px">
+          <!-- Avatar section -->
+          <div class="card animate-fade-in" style="margin-bottom: 16px">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 16px">Profile Picture</h3>
+            <div style="display: flex; align-items: center; gap: 20px">
+              <div
+                id="avatar-preview"
+                style="
+                  width: 90px;
+                  height: 90px;
+                  border-radius: 16px;
+                  background: var(--gradient-primary);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-size: 2rem;
+                  color: #fff;
+                  font-weight: 700;
+                  flex-shrink: 0;
+                  overflow: hidden;
+                "
+              >
+                ?
+              </div>
+              <div>
+                <input type="file" id="profile-pic-input" accept="image/*" style="display: none" />
+                <button
+                  class="btn btn-secondary btn-sm"
+                  onclick="document.getElementById('profile-pic-input').click()"
+                >
+                  📸 Upload Photo
+                </button>
+                <p class="form-hint" style="margin-top: 8px">JPG, PNG or GIF. Max 5MB.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Basic Info -->
+          <div class="card animate-fade-in delay-100" style="margin-bottom: 16px">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 20px">
+              Basic Information
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+              <div class="form-group" style="grid-column: 1/-1">
+                <label class="form-label">Full Name *</label>
+                <input class="form-input" type="text" id="name" placeholder="Your full name" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Branch / Department</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="branch"
+                  value="CSE"
+                  readonly
+                  style="background: rgba(255, 255, 255, 0.05); cursor: not-allowed"
+                />
+              </div>
+              <div class="form-group" id="year-group">
+                <label class="form-label" id="year-label-edit">Current Year</label>
+                <input
+                  class="form-input"
+                  type="number"
+                  id="currentYear"
+                  placeholder="1-4"
+                  min="1"
+                  max="4"
+                />
+              </div>
+              <div class="form-group" id="grad-group" style="display: none">
+                <label class="form-label">Graduation Year</label>
+                <input
+                  class="form-input"
+                  type="number"
+                  id="graduationYear"
+                  placeholder="e.g. 2024"
+                />
+              </div>
+              <div class="form-group" style="grid-column: 1/-1">
+                <label class="form-label">Bio</label>
+                <textarea
+                  class="form-textarea"
+                  id="bio"
+                  rows="3"
+                  placeholder="Tell others about yourself, your experience, and what you're passionate about..."
+                ></textarea>
+                <span class="form-hint">Max 500 characters</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills & Expertise -->
+          <div class="card animate-fade-in delay-200" style="margin-bottom: 16px">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 20px">
+              Skills & Expertise
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 16px">
+              <div class="form-group">
+                <label class="form-label">Skills</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="skills"
+                  placeholder="e.g. Python, React, DSA, Machine Learning (comma separated)"
+                />
+                <span class="form-hint">Separate skills with commas</span>
+              </div>
+              <div class="form-group" id="expertise-group">
+                <label class="form-label">Areas of Expertise (Seniors)</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="areasOfExpertise"
+                  placeholder="e.g. Web Dev, DSA, AI/ML, System Design"
+                />
+              </div>
+              <div class="form-group" id="interests-group">
+                <label class="form-label">Interests (Juniors)</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="interests"
+                  placeholder="e.g. Machine Learning, Competitive Programming, Web Dev"
+                />
+              </div>
+              <div class="form-group" id="goals-group">
+                <label class="form-label">Career Goals (Juniors)</label>
+                <textarea
+                  class="form-textarea"
+                  id="careerGoals"
+                  rows="2"
+                  placeholder="What are your career aspirations?"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Info -->
+          <div class="card animate-fade-in delay-300" style="margin-bottom: 16px">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 20px">
+              Professional Information
+            </h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px">
+              <div class="form-group" id="company-group">
+                <label class="form-label">Placement Company</label>
+                <input
+                  class="form-input"
+                  type="text"
+                  id="placementCompany"
+                  placeholder="e.g. Google, TCS, Infosys"
+                />
+              </div>
+              <div class="form-group" id="avail-group">
+                <label class="form-label">Available for Mentorship</label>
+                <label
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    cursor: pointer;
+                    margin-top: 12px;
+                  "
+                >
+                  <input
+                    type="checkbox"
+                    id="availability"
+                    style="width: 18px; height: 18px; accent-color: var(--primary)"
+                  />
+                  <span style="font-size: 14px; color: var(--text-secondary)"
+                    >Yes, I'm available</span
+                  >
+                </label>
+              </div>
+              <div class="form-group">
+                <label class="form-label">LinkedIn URL</label>
+                <div class="input-group">
+                  <span class="input-icon">🔗</span>
+                  <input
+                    class="form-input"
+                    type="url"
+                    id="linkedin"
+                    placeholder="https://linkedin.com/in/yourname"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">GitHub URL</label>
+                <div class="input-group">
+                  <span class="input-icon">🐙</span>
+                  <input
+                    class="form-input"
+                    type="url"
+                    id="github"
+                    placeholder="https://github.com/yourname"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save button -->
+          <div style="display: flex; gap: 12px; margin-bottom: 32px">
+            <button class="btn btn-primary btn-lg" id="save-btn">💾 Save Changes</button>
+            <a href="javascript:history.back()" class="btn btn-secondary btn-lg">Cancel</a>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script src="js/profile.js"></script>
+    <script>
+      // Show/hide fields based on role
+      const user = api.getUser();
+      if (user) {
+        const initials = getInitials(user.name);
+        const preview = document.getElementById('avatar-preview');
+        if (preview && !user.profilePicture) preview.textContent = initials;
+
+        if (user.role === 'senior') {
+          document.getElementById('year-group').style.display = 'none';
+          document.getElementById('grad-group').style.display = 'block';
+          document.getElementById('interests-group').style.display = 'none';
+          document.getElementById('goals-group').style.display = 'none';
+          document.getElementById('company-group').style.display = 'block';
+          document.getElementById('avail-group').style.display = 'block';
+        } else if (user.role === 'junior') {
+          document.getElementById('expertise-group').style.display = 'none';
+          document.getElementById('company-group').style.display = 'none';
+          document.getElementById('avail-group').style.display = 'none';
+        }
+      }
+    </script>
+  </body>
+</html>

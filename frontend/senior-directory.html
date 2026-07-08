@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Find Mentors — MentorBridge</title>
+    <meta
+      name="description"
+      content="Search and connect with senior mentors by branch, skills, domain, or company."
+    />
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/directory.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div class="page-header animate-fade-in">
+          <h1>🔍 Find Your Mentor</h1>
+          <p>Connect with seniors who can guide your career journey</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="card animate-fade-in" style="margin-bottom: 20px">
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr repeat(4, auto) auto;
+              gap: 12px;
+              align-items: end;
+              flex-wrap: wrap;
+            "
+          >
+            <div class="search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input
+                class="search-input"
+                type="text"
+                id="search-input"
+                placeholder="Search by name, skill, domain..."
+              />
+            </div>
+            <div class="form-group" style="min-width: 130px; display: none">
+              <label class="form-label">Branch</label>
+              <input class="form-input" type="text" id="branch-filter" placeholder="e.g. CSE" />
+            </div>
+            <div class="form-group" style="min-width: 130px">
+              <label class="form-label">Domain / Expertise</label>
+              <input class="form-input" type="text" id="domain-filter" placeholder="e.g. Web Dev" />
+            </div>
+            <div class="form-group" style="min-width: 130px">
+              <label class="form-label">Company</label>
+              <input class="form-input" type="text" id="company-filter" placeholder="e.g. Google" />
+            </div>
+            <div class="form-group" style="min-width: 120px">
+              <label class="form-label">Skill</label>
+              <input class="form-input" type="text" id="skill-filter" placeholder="e.g. Python" />
+            </div>
+            <button
+              class="btn btn-secondary btn-sm"
+              id="clear-filters"
+              style="align-self: flex-end; height: 42px"
+            >
+              ✕ Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick filters -->
+        <div
+          style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px"
+          class="animate-fade-in delay-100"
+        >
+          <span style="font-size: 13px; color: var(--text-muted); align-self: center">Quick:</span>
+          <button class="tag" onclick="quickFilter('domain', 'Web Development')">🌐 Web Dev</button>
+          <button class="tag" onclick="quickFilter('domain', 'DSA')">⚡ DSA</button>
+          <button class="tag" onclick="quickFilter('domain', 'AI/ML')">🤖 AI/ML</button>
+          <button class="tag" onclick="quickFilter('company', 'Google')">🔍 Google</button>
+          <button class="tag" onclick="quickFilter('company', 'Infosys')">🏢 Infosys</button>
+          <button class="tag" onclick="quickFilter('company', 'TCS')">🏢 TCS</button>
+          <button class="tag" onclick="quickFilter('company', 'Wipro')">🏢 Wipro</button>
+        </div>
+
+        <!-- Results header -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+          "
+          class="animate-fade-in delay-100"
+        >
+          <p style="color: var(--text-muted); font-size: 13px">
+            <span id="total-count">—</span> seniors found
+          </p>
+        </div>
+
+        <!-- Grid -->
+        <div class="senior-grid animate-fade-in delay-200" id="seniors-grid">
+          <!-- Populated by JS -->
+        </div>
+        <div id="pagination"></div>
+      </main>
+    </div>
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script src="js/directory.js"></script>
+    <script>
+      function quickFilter(type, value) {
+        const map = { domain: 'domain-filter', company: 'company-filter', skills: 'skill-filter' };
+        const el = document.getElementById(map[type]);
+        if (el) {
+          el.value = value;
+          el.dispatchEvent(new Event('input'));
+        }
+      }
+    </script>
+  </body>
+</html>

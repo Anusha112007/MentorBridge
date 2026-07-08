@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resources — MentorBridge</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/directory.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+          "
+          class="animate-fade-in"
+        >
+          <h1 style="font-size: 1.4rem; font-weight: 800">📚 Resources</h1>
+          <button class="btn btn-primary" id="upload-btn">+ Share Resource</button>
+        </div>
+
+        <!-- Category pills -->
+        <div
+          style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px"
+          class="animate-fade-in delay-100"
+        >
+          <button class="tag cat-pill active" data-cat="">All</button>
+          <button class="tag cat-pill" data-cat="dsa">⚡ DSA</button>
+          <button class="tag cat-pill" data-cat="web-dev">🌐 Web Dev</button>
+          <button class="tag cat-pill" data-cat="ai-ml">🤖 AI/ML</button>
+          <button class="tag cat-pill" data-cat="aptitude">🧠 Aptitude</button>
+          <button class="tag cat-pill" data-cat="resume">📄 Resume</button>
+          <button class="tag cat-pill" data-cat="core-subjects">📖 Core Subjects</button>
+          <button class="tag cat-pill" data-cat="other">📦 Other</button>
+        </div>
+
+        <!-- Search -->
+        <div class="search-wrapper animate-fade-in delay-100" style="margin-bottom: 16px">
+          <span class="search-icon">🔍</span>
+          <input
+            class="search-input"
+            type="text"
+            id="search-input"
+            placeholder="Search resources..."
+          />
+        </div>
+
+        <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px">
+          <span id="total-count">—</span> resources
+        </div>
+        <div id="resources-grid"></div>
+        <div id="pagination"></div>
+      </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="upload-modal">
+      <div class="modal" style="max-width: 500px">
+        <div class="modal-header">
+          <h3>📤 Share a Resource</h3>
+          <button
+            class="modal-close"
+            onclick="document.getElementById('upload-modal').classList.remove('active')"
+          >
+            ✕
+          </button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <div class="form-group">
+            <label class="form-label">Title *</label>
+            <input class="form-input" id="res-title" placeholder="e.g. Striver's DSA Sheet Notes" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea
+              class="form-textarea"
+              id="res-description"
+              rows="2"
+              placeholder="What does this cover?"
+            ></textarea>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+            <div class="form-group">
+              <label class="form-label">Category *</label>
+              <select class="form-select" id="res-category">
+                <option value="">Select</option>
+                <option value="dsa">DSA</option>
+                <option value="web-dev">Web Dev</option>
+                <option value="ai-ml">AI/ML</option>
+                <option value="aptitude">Aptitude</option>
+                <option value="resume">Resume</option>
+                <option value="core-subjects">Core Subjects</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Type *</label>
+              <select class="form-select" id="res-type">
+                <option value="">Select</option>
+                <option value="pdf">📄 PDF</option>
+                <option value="notes">📝 Notes</option>
+                <option value="drive-link">🔗 Drive Link</option>
+                <option value="video-link">🎬 Video</option>
+                <option value="other">📦 Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" id="subject-group" style="display: none">
+            <label class="form-label">Subject *</label>
+            <select class="form-select" id="res-subject">
+              <option value="">Select Subject</option>
+              <optgroup label="Semester I">
+                <option value="LAC">LAC</option>
+                <option value="ENGG. GRAP">ENGG. GRAP</option>
+                <option value="CHEM">CHEM</option>
+                <option value="BCME">BCME</option>
+                <option value="HWYS">HWYS</option>
+                <option value="C-LANG">C-LANG</option>
+                <option value="CHEM LAB">CHEM LAB</option>
+                <option value="CPL">CPL</option>
+                <option value="EWS">EWS</option>
+              </optgroup>
+              <optgroup label="Semester II">
+                <option value="NSS">NSS</option>
+                <option value="DEVC">DEVC</option>
+                <option value="EP">EP</option>
+                <option value="CE">CE</option>
+                <option value="BEEE">BEEE</option>
+                <option value="DS">DS</option>
+                <option value="CE LAB">CE LAB</option>
+                <option value="EP LAB">EP LAB</option>
+                <option value="EEE LAB">EEE LAB</option>
+                <option value="DS LAB">DS LAB</option>
+                <option value="IT WS">IT WS</option>
+              </optgroup>
+              <optgroup label="Semester III">
+                <option value="MFCS">MFCS</option>
+                <option value="UHV">UHV</option>
+                <option value="DL&CO">DL&CO</option>
+                <option value="SE">SE</option>
+                <option value="OOPS JAVA">OOPS JAVA</option>
+                <option value="ES">ES</option>
+                <option value="CT Lab">CT Lab</option>
+                <option value="JAVA LAB">JAVA LAB</option>
+                <option value="FSD">FSD</option>
+              </optgroup>
+              <optgroup label="Higher Semesters">
+                <option value="DBMS">DBMS</option>
+                <option value="Operating Systems">Operating Systems</option>
+                <option value="Computer Networks">Computer Networks</option>
+                <option value="Python Programming">Python Programming</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">URL / Link</label>
+            <input
+              class="form-input"
+              id="res-url"
+              type="url"
+              placeholder="https://drive.google.com/..."
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Or Upload File</label>
+            <input
+              type="file"
+              id="res-file"
+              accept=".pdf,.doc,.docx,.txt,.zip"
+              style="
+                padding: 8px;
+                background: var(--bg-elevated);
+                border: 1px solid var(--border);
+                border-radius: 8px;
+                color: var(--text-secondary);
+                width: 100%;
+                font-size: 13px;
+              "
+            />
+          </div>
+          <button class="btn btn-primary btn-full" id="submit-resource">Share Resource →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script>
+      let currentPage = 1;
+      let currentCat = '';
+      let searchTimer;
+
+      const TYPE_ICONS = {
+        pdf: '📄',
+        notes: '📝',
+        'drive-link': '🔗',
+        'video-link': '🎬',
+        other: '📦',
+      };
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        const user = requireAuth();
+        if (!user) return;
+        renderNavbar();
+        renderSidebar(user.role);
+        loadResources();
+
+        // Category pills
+        document.querySelectorAll('.cat-pill').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.cat-pill').forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentCat = btn.dataset.cat;
+            currentPage = 1;
+            loadResources();
+          });
+        });
+
+        // Search
+        document.getElementById('search-input').addEventListener('input', () => {
+          clearTimeout(searchTimer);
+          searchTimer = setTimeout(() => {
+            currentPage = 1;
+            loadResources();
+          }, 400);
+        });
+
+        // Toggle subject field
+        document.getElementById('res-category').addEventListener('change', (e) => {
+          const subGroup = document.getElementById('subject-group');
+          if (e.target.value === 'core-subjects') {
+            subGroup.style.display = 'block';
+          } else {
+            subGroup.style.display = 'none';
+            document.getElementById('res-subject').value = '';
+          }
+        });
+
+        // Upload button
+        document.getElementById('upload-btn').addEventListener('click', () => {
+          document.getElementById('upload-modal').classList.add('active');
+        });
+        document.getElementById('upload-modal').addEventListener('click', function (e) {
+          if (e.target === this) this.classList.remove('active');
+        });
+
+        // Submit
+        document.getElementById('submit-resource').addEventListener('click', async () => {
+          const title = document.getElementById('res-title').value.trim();
+          const category = document.getElementById('res-category').value;
+          const type = document.getElementById('res-type').value;
+          const url = document.getElementById('res-url').value.trim();
+          const file = document.getElementById('res-file').files[0];
+          const desc = document.getElementById('res-description').value.trim();
+          const subject = document.getElementById('res-subject').value;
+
+          if (!title || !category || !type) {
+            showToast('warning', 'Fill in title, category, and type');
+            return;
+          }
+          if (category === 'core-subjects' && !subject) {
+            showToast('warning', 'Please select a subject');
+            return;
+          }
+          if (!url && !file) {
+            showToast('warning', 'Provide a URL or upload a file');
+            return;
+          }
+
+          const btn = document.getElementById('submit-resource');
+          btn.disabled = true;
+          btn.textContent = 'Uploading...';
+          try {
+            const fd = new FormData();
+            fd.append('title', title);
+            fd.append('category', category);
+            fd.append('type', type);
+            fd.append('description', desc);
+            if (category === 'core-subjects') {
+              fd.append('subject', subject);
+            }
+            if (url) fd.append('url', url);
+            if (file) fd.append('file', file);
+            await api.postForm('/resources', fd);
+            showToast('success', 'Resource shared! 🎉');
+            document.getElementById('upload-modal').classList.remove('active');
+            document.getElementById('res-title').value = '';
+            document.getElementById('res-description').value = '';
+            document.getElementById('res-url').value = '';
+            document.getElementById('res-file').value = '';
+            document.getElementById('res-subject').value = '';
+            document.getElementById('subject-group').style.display = 'none';
+            loadResources();
+          } catch (err) {
+            showToast('error', 'Upload failed', err.message);
+          }
+          btn.disabled = false;
+          btn.textContent = 'Share Resource →';
+        });
+      });
+
+      async function loadResources() {
+        const search = document.getElementById('search-input')?.value || '';
+        const el = document.getElementById('resources-grid');
+        el.innerHTML =
+          '<div style="color:var(--text-muted);font-size:13px;padding:16px">Loading...</div>';
+        try {
+          const params = new URLSearchParams({ page: currentPage, limit: 12 });
+          if (currentCat) params.set('category', currentCat);
+          if (search) params.set('search', search);
+          const data = await api.get(`/resources?${params}`);
+          const resources = data.resources || [];
+          document.getElementById('total-count').textContent = data.total || 0;
+
+          if (!resources.length) {
+            el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📭</div><h3>No resources found</h3><p>Be the first to share one!</p></div>`;
+            return;
+          }
+
+          el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">
+      ${resources
+        .map((r) => {
+          const icon = TYPE_ICONS[r.type] || '📦';
+          const link = r.url
+            ? r.url.startsWith('/uploads')
+              ? 'http://localhost:5000' + r.url
+              : r.url
+            : null;
+          return `
+        <div class="card" style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:40px;height:40px;border-radius:10px;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">${icon}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.title}</div>
+              <div style="font-size:11px;color:var(--text-muted)">${r.category} · ${r.type}</div>
+            </div>
+          </div>
+          ${r.description ? `<p style="font-size:12px;color:var(--text-muted);line-height:1.6;margin:0">${r.description.slice(0, 80)}${r.description.length > 80 ? '…' : ''}</p>` : ''}
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:auto">
+            <span style="font-size:11px;color:var(--text-muted)">By ${r.uploadedBy?.name || '—'}</span>
+            ${link ? `<a href="${link}" target="_blank" class="btn btn-primary btn-sm" style="font-size:12px">Open ↗</a>` : `<span class="btn btn-ghost btn-sm" style="font-size:12px;opacity:.4">No link</span>`}
+          </div>
+        </div>`;
+        })
+        .join('')}
+    </div>`;
+
+          // Pagination
+          const pages = Math.ceil((data.total || 0) / 12);
+          const pg = document.getElementById('pagination');
+          if (pages > 1) {
+            pg.innerHTML = `<div class="pagination" style="margin-top:20px">
+        <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goPage(${currentPage - 1})">‹</button>
+        ${Array.from({ length: pages }, (_, i) => `<button class="page-btn ${i + 1 === currentPage ? 'active' : ''}" onclick="goPage(${i + 1})">${i + 1}</button>`).join('')}
+        <button class="page-btn" ${currentPage === pages ? 'disabled' : ''} onclick="goPage(${currentPage + 1})">›</button>
+      </div>`;
+          } else {
+            pg.innerHTML = '';
+          }
+        } catch (err) {
+          el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3></div>`;
+        }
+      }
+
+      function goPage(p) {
+        currentPage = p;
+        loadResources();
+        window.scrollTo(0, 0);
+      }
+      window.goPage = goPage;
+    </script>
+  </body>
+</html>

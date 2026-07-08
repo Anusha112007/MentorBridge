@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MentorBridge — Student Doubt & Resource Platform</title>
+    <meta
+      name="description"
+      content="Ask doubts, share resources, and chat with seniors and juniors in your college."
+    />
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/landing.css" />
+  </head>
+  <body>
+    <nav class="navbar navbar-landing" id="navbar"></nav>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-bg">
+        <div class="hero-orb hero-orb-1"></div>
+        <div class="hero-orb hero-orb-2"></div>
+        <div class="hero-orb hero-orb-3"></div>
+        <div class="hero-grid"></div>
+      </div>
+      <div
+        class="container"
+        style="text-align: center; z-index: 1; position: relative; padding: 100px 24px 60px"
+      >
+        <div class="hero-badge" style="margin: 0 auto 24px">
+          <span class="dot"></span>🎓 Exclusive to CSE Branch
+        </div>
+        <h1
+          style="
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 20px;
+          "
+        >
+          Ask Doubts. Share Resources.<br />
+          <span class="gradient-text">Chat with Seniors.</span>
+        </h1>
+        <p
+          style="
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto 36px;
+            line-height: 1.8;
+          "
+        >
+          A simple platform for students to clear doubts, share study materials, and connect with
+          seniors — all in one place.
+        </p>
+        <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap">
+          <a href="login.html#register" class="btn btn-primary btn-lg">Get Started →</a>
+          <a href="login.html" class="btn btn-secondary btn-lg">Sign In</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 Features -->
+    <section style="padding: 80px 0; background: var(--bg-secondary)">
+      <div class="container">
+        <div style="text-align: center; margin-bottom: 52px">
+          <div class="section-label">What you can do</div>
+          <h2 style="font-size: 2rem; font-weight: 800; margin-top: 8px">
+            Three things. Done well.
+          </h2>
+        </div>
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+          "
+        >
+          <!-- Doubts -->
+          <div class="card" style="text-align: center; padding: 36px 28px">
+            <div style="font-size: 3rem; margin-bottom: 16px">❓</div>
+            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 10px">Doubts</h3>
+            <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.8">
+              Post any academic or career doubt. Seniors answer. Juniors learn. Simple.
+            </p>
+            <a href="login.html#register" class="btn btn-ghost btn-sm" style="margin-top: 20px"
+              >Ask a Doubt →</a
+            >
+          </div>
+
+          <!-- Resources -->
+          <div class="card" style="text-align: center; padding: 36px 28px">
+            <div style="font-size: 3rem; margin-bottom: 16px">📚</div>
+            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 10px">Resources</h3>
+            <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.8">
+              Seniors upload notes, PDFs, and links. Juniors download and learn. No scattered
+              drives.
+            </p>
+            <a href="login.html#register" class="btn btn-ghost btn-sm" style="margin-top: 20px"
+              >Browse Resources →</a
+            >
+          </div>
+
+          <!-- Chat -->
+          <div class="card" style="text-align: center; padding: 36px 28px">
+            <div style="font-size: 3rem; margin-bottom: 16px">✉️</div>
+            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 10px">Direct Chat</h3>
+            <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.8">
+              Message any senior directly. Get personalised guidance in a private, one-to-one chat.
+            </p>
+            <a href="login.html#register" class="btn btn-ghost btn-sm" style="margin-top: 20px"
+              >Start Chatting →</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section style="padding: 80px 0">
+      <div class="container">
+        <div class="cta-box animate-scale-in" style="text-align: center">
+          <h2>Ready to join?</h2>
+          <p style="color: rgba(255, 255, 255, 0.8); margin: 12px 0 28px">
+            Sign up in seconds. No email verification needed.
+          </p>
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap">
+            <a href="login.html#register" class="btn btn-white btn-lg">Create Account</a>
+            <a href="login.html" class="btn btn-outline-white btn-lg">Sign In</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+          "
+        >
+          <a href="index.html" class="navbar-brand">
+            <div class="brand-logo">🎓</div>
+            <span class="brand-name" style="font-size: 1.1rem; margin-left: 10px"
+              >MentorBridge</span
+            >
+          </a>
+          <div style="display: flex; gap: 24px; font-size: 13px">
+            <a href="doubts.html" style="color: var(--text-muted)">Doubts</a>
+            <a href="resources.html" style="color: var(--text-muted)">Resources</a>
+            <a href="messages.html" style="color: var(--text-muted)">Messages</a>
+          </div>
+          <p style="color: var(--text-muted); font-size: 12px">© 2024 MentorBridge</p>
+        </div>
+      </div>
+    </footer>
+
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script>
+      renderNavbar('home');
+    </script>
+  </body>
+</html>

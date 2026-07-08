@@ -1,0 +1,335 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doubts — MentorBridge</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/directory.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content" id="main">
+        <!-- List view -->
+        <div id="list-view">
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin-bottom: 20px;
+            "
+            class="animate-fade-in"
+          >
+            <h1 style="font-size: 1.4rem; font-weight: 800">❓ Doubts</h1>
+            <button class="btn btn-primary" id="ask-btn">+ Ask a Doubt</button>
+          </div>
+
+          <!-- Search -->
+          <div class="search-wrapper animate-fade-in delay-100" style="margin-bottom: 16px">
+            <span class="search-icon">🔍</span>
+            <input
+              class="search-input"
+              type="text"
+              id="search-input"
+              placeholder="Search doubts..."
+            />
+          </div>
+
+          <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px">
+            <span id="total-count">—</span> doubts
+          </div>
+          <div id="doubts-list"></div>
+          <div id="pagination"></div>
+        </div>
+
+        <!-- Detail view (shown when ?id= in URL) -->
+        <div id="detail-view" style="display: none; max-width: 760px">
+          <button class="btn btn-ghost btn-sm" style="margin-bottom: 16px" onclick="showList()">
+            ← Back to Doubts
+          </button>
+          <div id="question-detail"></div>
+          <div id="answers-section" style="margin-top: 24px"></div>
+          <div class="card" id="answer-form" style="margin-top: 16px">
+            <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px">✍️ Your Answer</h3>
+            <textarea
+              class="form-textarea"
+              id="answer-body"
+              rows="4"
+              placeholder="Write a helpful answer..."
+            ></textarea>
+            <button class="btn btn-primary" style="margin-top: 12px" id="submit-answer">
+              Post Answer
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Ask Doubt Modal -->
+    <div class="modal-overlay" id="ask-modal">
+      <div class="modal" style="max-width: 520px">
+        <div class="modal-header">
+          <h3>❓ Ask a Doubt</h3>
+          <button
+            class="modal-close"
+            onclick="document.getElementById('ask-modal').classList.remove('active')"
+          >
+            ✕
+          </button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <div class="form-group">
+            <label class="form-label">Your Question *</label>
+            <input
+              class="form-input"
+              type="text"
+              id="q-title"
+              placeholder="e.g. How do I start DSA preparation?"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Details</label>
+            <textarea
+              class="form-textarea"
+              id="q-body"
+              rows="4"
+              placeholder="Add any extra context or details..."
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select class="form-select" id="q-category">
+              <option value="general">General</option>
+              <option value="placement">Placement</option>
+              <option value="internship">Internship</option>
+              <option value="subject">Subject</option>
+              <option value="career">Career</option>
+              <option value="project">Project</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-full" id="submit-question">Post Doubt →</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script>
+      let currentPage = 1;
+      let searchTimer;
+      let allQuestions = [];
+
+      document.addEventListener('DOMContentLoaded', async () => {
+        const user = requireAuth();
+        if (!user) return;
+        renderNavbar();
+        renderSidebar(user.role);
+
+        // Check for detail view
+        const params = new URLSearchParams(window.location.search);
+        const qId = params.get('id');
+        if (qId) {
+          showDetail(qId);
+          return;
+        }
+
+        loadDoubts();
+
+        document.getElementById('ask-btn').addEventListener('click', () => {
+          document.getElementById('ask-modal').classList.add('active');
+        });
+        document.getElementById('ask-modal').addEventListener('click', function (e) {
+          if (e.target === this) this.classList.remove('active');
+        });
+        document.getElementById('search-input').addEventListener('input', function () {
+          clearTimeout(searchTimer);
+          searchTimer = setTimeout(() => {
+            currentPage = 1;
+            loadDoubts();
+          }, 400);
+        });
+        document.getElementById('submit-question').addEventListener('click', async () => {
+          const title = document.getElementById('q-title').value.trim();
+          const body = document.getElementById('q-body').value.trim();
+          const category = document.getElementById('q-category').value;
+          if (!title) {
+            showToast('warning', 'Enter your question');
+            return;
+          }
+          const btn = document.getElementById('submit-question');
+          btn.disabled = true;
+          btn.textContent = 'Posting...';
+          try {
+            await api.post('/questions', { title, body, category });
+            showToast('success', 'Doubt posted! 🎉');
+            document.getElementById('ask-modal').classList.remove('active');
+            document.getElementById('q-title').value = '';
+            document.getElementById('q-body').value = '';
+            loadDoubts();
+          } catch (err) {
+            showToast('error', 'Failed', err.message);
+          }
+          btn.disabled = false;
+          btn.textContent = 'Post Doubt →';
+        });
+      });
+
+      async function loadDoubts() {
+        const search = document.getElementById('search-input')?.value || '';
+        const el = document.getElementById('doubts-list');
+        el.innerHTML =
+          '<div style="color:var(--text-muted);font-size:13px;padding:16px">Loading...</div>';
+        try {
+          const params = new URLSearchParams({
+            page: currentPage,
+            limit: 10,
+            ...(search && { search }),
+          });
+          const data = await api.get(`/questions?${params}`);
+          const questions = data.questions || [];
+          document.getElementById('total-count').textContent = data.total || 0;
+
+          if (!questions.length) {
+            el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">❓</div><h3>No doubts yet</h3><p>Be the first to ask!</p></div>`;
+            return;
+          }
+          el.innerHTML = questions
+            .map(
+              (q) => `
+      <div class="card" style="margin-bottom:10px;cursor:pointer;transition:border-color .2s" onclick="showDetail('${q._id}')" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px">${q.title}</div>
+            ${q.body ? `<div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${q.body}</div>` : ''}
+            <div style="display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text-muted)">
+              <span>👤 ${q.author?.name || 'Anonymous'}</span>
+              <span>💬 ${q.answers?.length || 0} answers</span>
+              <span>${timeAgo(q.createdAt)}</span>
+            </div>
+          </div>
+          <span class="badge badge-primary" style="flex-shrink:0">${q.category}</span>
+        </div>
+      </div>`
+            )
+            .join('');
+
+          // Pagination
+          const pages = Math.ceil((data.total || 0) / 10);
+          const pg = document.getElementById('pagination');
+          if (pages > 1) {
+            pg.innerHTML = `<div class="pagination">
+        <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goPage(${currentPage - 1})">‹</button>
+        ${Array.from({ length: pages }, (_, i) => `<button class="page-btn ${i + 1 === currentPage ? 'active' : ''}" onclick="goPage(${i + 1})">${i + 1}</button>`).join('')}
+        <button class="page-btn" ${currentPage === pages ? 'disabled' : ''} onclick="goPage(${currentPage + 1})">›</button>
+      </div>`;
+          } else {
+            pg.innerHTML = '';
+          }
+        } catch (err) {
+          el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3></div>`;
+        }
+      }
+
+      function goPage(p) {
+        currentPage = p;
+        loadDoubts();
+        window.scrollTo(0, 0);
+      }
+      window.goPage = goPage;
+
+      async function showDetail(id) {
+        document.getElementById('list-view').style.display = 'none';
+        document.getElementById('detail-view').style.display = 'block';
+        history.pushState({}, '', `?id=${id}`);
+
+        const user = api.getUser();
+        try {
+          const data = await api.get(`/questions/${id}`);
+          const q = data.question;
+
+          document.getElementById('question-detail').innerHTML = `
+      <div class="card">
+        <span class="badge badge-primary" style="margin-bottom:10px">${q.category}</span>
+        <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:10px">${q.title}</h2>
+        ${q.body ? `<p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:16px">${q.body}</p>` : ''}
+        <div style="font-size:12px;color:var(--text-muted);display:flex;gap:16px;padding-top:12px;border-top:1px solid var(--border-subtle)">
+          <span>👤 ${q.author?.name || 'Anonymous'}</span>
+          <span>👁️ ${q.views} views</span>
+          <span>${timeAgo(q.createdAt)}</span>
+        </div>
+      </div>`;
+
+          const answers = q.answers || [];
+          const aSection = document.getElementById('answers-section');
+          aSection.innerHTML = `<h3 style="font-size:14px;font-weight:700;margin-bottom:12px">${answers.length} Answer${answers.length !== 1 ? 's' : ''}</h3>`;
+          if (!answers.length) {
+            aSection.innerHTML += `<div class="card" style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px">No answers yet. Be the first!</div>`;
+          } else {
+            aSection.innerHTML += answers
+              .map(
+                (a) => `
+        <div class="card" style="margin-bottom:10px;${a.isAccepted ? 'border-color:var(--success)' : ''}">
+          ${a.isAccepted ? '<div style="font-size:12px;font-weight:700;color:var(--success);margin-bottom:8px">✅ Accepted Answer</div>' : ''}
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:12px">${a.body}</p>
+          <div style="font-size:12px;color:var(--text-muted);display:flex;gap:12px">
+            <span>👤 ${a.author?.name || '—'}</span>
+            <span>${timeAgo(a.createdAt)}</span>
+            ${q.author?._id === user?._id && !q.acceptedAnswer ? `<button onclick="acceptAnswer('${a._id}','${id}')" style="background:none;border:none;color:var(--primary-light);cursor:pointer;font-size:12px;padding:0;margin-left:auto">✓ Accept</button>` : ''}
+          </div>
+        </div>`
+              )
+              .join('');
+          }
+
+          document.getElementById('submit-answer').onclick = async () => {
+            const body = document.getElementById('answer-body').value.trim();
+            if (!body) {
+              showToast('warning', 'Write your answer');
+              return;
+            }
+            const btn = document.getElementById('submit-answer');
+            btn.disabled = true;
+            btn.textContent = 'Posting...';
+            try {
+              await api.post(`/questions/${id}/answers`, { body });
+              showToast('success', 'Answer posted!');
+              document.getElementById('answer-body').value = '';
+              showDetail(id);
+            } catch (err) {
+              showToast('error', 'Failed', err.message);
+            }
+            btn.disabled = false;
+            btn.textContent = 'Post Answer';
+          };
+        } catch (err) {
+          document.getElementById('question-detail').innerHTML =
+            `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3></div>`;
+        }
+      }
+      window.showDetail = showDetail;
+
+      async function acceptAnswer(aid, qid) {
+        try {
+          await api.put(`/questions/answers/${aid}/accept`, {});
+          showToast('success', '✅ Answer accepted!');
+          showDetail(qid);
+        } catch (err) {
+          showToast('error', 'Failed', err.message);
+        }
+      }
+      window.acceptAnswer = acceptAnswer;
+
+      function showList() {
+        document.getElementById('list-view').style.display = 'block';
+        document.getElementById('detail-view').style.display = 'none';
+        history.pushState({}, '', window.location.pathname);
+      }
+      window.showList = showList;
+    </script>
+  </body>
+</html>

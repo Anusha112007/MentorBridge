@@ -1,0 +1,167 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard — MentorBridge</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/dashboard.css" />
+    <link rel="stylesheet" href="css/pages/directory.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div class="page-header animate-fade-in">
+          <h1>⚙️ Admin Dashboard</h1>
+          <p>Manage users, content, and platform activity</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="admin-stats-grid animate-fade-in">
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(108, 99, 255, 0.15)">👥</div>
+            <div>
+              <div class="dash-stat-value" id="stat-users">—</div>
+              <div class="dash-stat-label">Total Users</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(168, 85, 247, 0.15)">🏆</div>
+            <div>
+              <div class="dash-stat-value" id="stat-seniors">—</div>
+              <div class="dash-stat-label">Seniors</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(6, 182, 212, 0.15)">👨‍🎓</div>
+            <div>
+              <div class="dash-stat-value" id="stat-juniors">—</div>
+              <div class="dash-stat-label">Juniors</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(34, 197, 94, 0.15)">🤝</div>
+            <div>
+              <div class="dash-stat-value" id="stat-mentorships">—</div>
+              <div class="dash-stat-label">Active Mentorships</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(245, 158, 11, 0.15)">💬</div>
+            <div>
+              <div class="dash-stat-value" id="stat-questions">—</div>
+              <div class="dash-stat-label">Questions</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(239, 68, 68, 0.15)">🏢</div>
+            <div>
+              <div class="dash-stat-value" id="stat-placements">—</div>
+              <div class="dash-stat-label">Placements</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(16, 185, 129, 0.15)">📚</div>
+            <div>
+              <div class="dash-stat-value" id="stat-resources">—</div>
+              <div class="dash-stat-label">Resources</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Admin Tabs -->
+        <div class="tabs animate-fade-in delay-100" style="margin: 24px 0 0">
+          <button class="tab-btn admin-tab active" data-section="users">👥 User Management</button>
+          <button class="tab-btn admin-tab" data-section="reported">🚨 Reported Content</button>
+        </div>
+
+        <!-- Users section -->
+        <div
+          id="section-users"
+          class="admin-section active animate-fade-in delay-200"
+          style="margin-top: 16px"
+        >
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              margin-bottom: 16px;
+              flex-wrap: wrap;
+            "
+          >
+            <div class="search-wrapper" style="flex: 1; min-width: 220px">
+              <span class="search-icon">🔍</span>
+              <input
+                class="search-input"
+                type="text"
+                id="user-search"
+                placeholder="Search by name or email..."
+              />
+            </div>
+            <select class="form-select" id="role-filter" style="width: 150px">
+              <option value="">All Roles</option>
+              <option value="junior">Juniors</option>
+              <option value="senior">Seniors</option>
+              <option value="admin">Admins</option>
+            </select>
+          </div>
+          <div class="admin-table-wrapper">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Branch</th>
+                  <th>Verified</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-tbody">
+                <tr>
+                  <td
+                    colspan="6"
+                    style="text-align: center; padding: 32px; color: var(--text-muted)"
+                  >
+                    Loading...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reported Content -->
+        <div
+          id="section-reported"
+          class="admin-section animate-fade-in"
+          style="margin-top: 16px; display: none"
+        >
+          <div id="reported-container">
+            <div class="empty-state">
+              <div class="animate-spin" style="font-size: 2rem">⏳</div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script src="js/admin.js"></script>
+    <script>
+      // Show/hide sections on tab click
+      document.querySelectorAll('.admin-tab').forEach((tab) => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.admin-section').forEach((s) => (s.style.display = 'none'));
+          const sec = document.getElementById('section-' + tab.dataset.section);
+          if (sec) sec.style.display = 'block';
+        });
+      });
+    </script>
+  </body>
+</html>

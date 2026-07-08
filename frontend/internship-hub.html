@@ -1,0 +1,167 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Internship Hub — MentorBridge</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/directory.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <div
+          class="welcome-banner animate-fade-in"
+          style="margin-bottom: 24px; background: linear-gradient(135deg, #06b6d4, #6c63ff)"
+        >
+          <div class="welcome-text">
+            <h1 style="color: #fff; font-size: 1.6rem">💼 Internship Experience Hub</h1>
+            <p style="color: rgba(255, 255, 255, 0.85)">
+              Learn how seniors landed internships. Resume tips, interview strategies, and real
+              learnings.
+            </p>
+          </div>
+          <div class="welcome-emoji">🌟</div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+          "
+          class="animate-fade-in delay-100"
+        >
+          <div class="search-wrapper" style="flex: 1; min-width: 200px">
+            <span class="search-icon">🔍</span>
+            <input
+              class="search-input"
+              type="text"
+              id="search-input"
+              placeholder="Search by company, role, or keyword..."
+            />
+          </div>
+          <input
+            class="form-input"
+            type="text"
+            id="company-filter"
+            placeholder="🏢 Filter by company"
+            style="width: 180px"
+          />
+          <span style="color: var(--text-muted); font-size: 13px"
+            ><span id="total-count">—</span> experiences</span
+          >
+          <div id="share-section"></div>
+        </div>
+
+        <div class="hub-grid animate-fade-in delay-200" id="exp-grid"></div>
+        <div id="pagination"></div>
+      </main>
+    </div>
+
+    <!-- Share Internship Modal -->
+    <div class="modal-overlay" id="share-modal">
+      <div class="modal" style="max-width: 640px">
+        <div class="modal-header">
+          <h3>💼 Share Internship Experience</h3>
+          <button class="modal-close" id="close-share-modal">✕</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+            <div class="form-group">
+              <label class="form-label">Company *</label
+              ><input class="form-input" id="exp-company" placeholder="e.g. Google, TCS" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role *</label
+              ><input class="form-input" id="exp-role" placeholder="e.g. SDE Intern" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Year *</label
+              ><input class="form-input" type="number" id="exp-year" placeholder="2024" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration</label
+              ><input class="form-input" id="exp-duration" placeholder="e.g. 2 months" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">How you found it *</label
+            ><textarea
+              class="form-textarea"
+              id="exp-how"
+              rows="2"
+              placeholder="LinkedIn, campus drive, referral, cold email?"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Experience & Learnings *</label
+            ><textarea
+              class="form-textarea"
+              id="exp-process"
+              rows="4"
+              placeholder="What did you work on? What did you learn?"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Resume Tips</label
+            ><textarea
+              class="form-textarea"
+              id="exp-resume"
+              rows="2"
+              placeholder="What made your resume stand out?"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Interview Rounds</label
+            ><textarea
+              class="form-textarea"
+              id="exp-interview"
+              rows="2"
+              placeholder="Describe the interview process..."
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Useful Resources</label
+            ><input
+              class="form-input"
+              id="exp-resources"
+              placeholder="Links, books, courses you used"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tags</label
+            ><input
+              class="form-input"
+              id="exp-tags"
+              placeholder="e.g. web-dev, python, off-campus"
+            />
+          </div>
+          <button class="btn btn-primary btn-full" id="submit-exp">
+            Share Internship Experience 🎉
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script src="js/experiences.js"></script>
+    <script>
+      const u = api.getUser();
+      if (u?.role === 'senior') {
+        document.getElementById('share-section').innerHTML =
+          `<button class="btn btn-primary" id="share-btn">📝 Share Your Experience</button>`;
+      }
+      document.getElementById('share-modal')?.addEventListener('click', function (e) {
+        if (e.target === this) this.classList.remove('active');
+      });
+    </script>
+  </body>
+</html>

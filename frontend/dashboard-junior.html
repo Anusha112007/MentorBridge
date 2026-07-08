@@ -1,0 +1,182 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — MentorBridge</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/dashboard.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <!-- Welcome -->
+        <div class="welcome-banner animate-fade-in">
+          <div class="welcome-text">
+            <h2>Welcome, <span id="user-name">Student</span> 👋</h2>
+            <p id="welcome-sub">Here's what's happening today.</p>
+          </div>
+          <div class="welcome-emoji">🎓</div>
+        </div>
+
+        <!-- 3 stats -->
+        <div class="dashboard-stats animate-fade-in delay-100">
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(108, 99, 255, 0.15)">🤝</div>
+            <div>
+              <div class="dash-stat-value" id="stat-mentors">—</div>
+              <div class="dash-stat-label">My Mentors</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(245, 158, 11, 0.15)">⏳</div>
+            <div>
+              <div class="dash-stat-value" id="stat-pending">—</div>
+              <div class="dash-stat-label">Pending Requests</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(34, 197, 94, 0.15)">📚</div>
+            <div>
+              <div class="dash-stat-value" id="stat-resources">—</div>
+              <div class="dash-stat-label">Resources</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two columns -->
+        <div class="two-col-layout animate-fade-in delay-200">
+          <!-- LEFT — Mentorship requests -->
+          <div class="card">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 16px;
+              "
+            >
+              <h3 style="font-size: 15px; font-weight: 700">🤝 My Mentorship Requests</h3>
+              <a href="mentorship.html" class="btn btn-ghost btn-sm">View All</a>
+            </div>
+            <div id="mentorship-list">
+              <div
+                style="text-align: center; color: var(--text-muted); padding: 24px; font-size: 13px"
+              >
+                Loading...
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT — Actions + recent placements -->
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <!-- Quick actions (only 2 links, no full card grid) -->
+            <div class="card">
+              <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px">
+                🚀 Quick Actions
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <a href="senior-directory.html" class="btn btn-primary btn-sm btn-full"
+                  >🔍 Find a Senior Mentor</a
+                >
+                <a href="resources.html" class="btn btn-ghost btn-sm btn-full"
+                  >📚 Browse Resources</a
+                >
+                <a href="forum.html" class="btn btn-ghost btn-sm btn-full">💬 Ask a Question</a>
+              </div>
+            </div>
+
+            <!-- Recent placements -->
+            <div class="card">
+              <div
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  margin-bottom: 12px;
+                "
+              >
+                <h3 style="font-size: 14px; font-weight: 700">🏢 Recent Placements</h3>
+                <a href="placement-hub.html" class="btn btn-ghost btn-sm">See All</a>
+              </div>
+              <div id="recent-placements">
+                <div style="color: var(--text-muted); font-size: 13px">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        const user = requireAuth(['junior']);
+        if (!user) return;
+        renderNavbar();
+        renderSidebar('junior');
+        document.getElementById('user-name').textContent = user.name?.split(' ')[0] || 'Student';
+
+        // Mentorship requests
+        try {
+          const data = await api.get('/mentorship/my-requests');
+          const requests = (data.requests || []).slice(0, 4);
+          const accepted = requests.filter((r) => r.status === 'accepted').length;
+          const pending = requests.filter((r) => r.status === 'pending').length;
+          document.getElementById('stat-mentors').textContent = accepted;
+          document.getElementById('stat-pending').textContent = pending;
+
+          const list = document.getElementById('mentorship-list');
+          if (!requests.length) {
+            list.innerHTML = `<div class="empty-state" style="padding:16px"><div class="empty-state-icon" style="font-size:2rem">🤝</div><h3 style="font-size:14px">No requests yet</h3><a href="senior-directory.html" class="btn btn-primary btn-sm" style="margin-top:8px">Find Mentors</a></div>`;
+          } else {
+            list.innerHTML = requests
+              .map(
+                (r) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-subtle)">
+          ${renderAvatar(r.senior, 'avatar-sm')}
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${r.senior?.name || '—'}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${r.senior?.branch || ''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge ${r.status === 'accepted' ? 'badge-success' : r.status === 'rejected' ? 'badge-error' : 'badge-warning'}">${r.status}</span>
+            ${r.status === 'accepted' ? `<a href="messages.html?userId=${r.senior?._id}" class="btn btn-primary btn-sm" style="padding:4px 8px;font-size:11px">✉️ Chat</a>` : ''}
+          </div>
+        </div>`
+              )
+              .join('');
+          }
+        } catch (e) {}
+
+        // Resources count
+        try {
+          const rdata = await api.get('/resources?limit=1');
+          document.getElementById('stat-resources').textContent = rdata.total || 0;
+        } catch (e) {}
+
+        // Recent placements
+        try {
+          const pd = await api.get('/experiences/placement?limit=3');
+          const el = document.getElementById('recent-placements');
+          el.innerHTML =
+            (pd.experiences || [])
+              .map(
+                (e) => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-subtle)">
+        <div style="width:36px;height:36px;border-radius:8px;background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--primary-light)">${e.company[0]}</div>
+        <div style="flex:1"><div style="font-size:12px;font-weight:600">${e.company}</div><div style="font-size:11px;color:var(--text-muted)">${e.role}</div></div>
+        <a href="placement-detail.html?id=${e._id}" class="btn btn-ghost btn-sm" style="font-size:11px">Read</a>
+      </div>`
+              )
+              .join('') ||
+            '<div style="color:var(--text-muted);font-size:13px">No experiences shared yet.</div>';
+        } catch (e) {}
+      });
+    </script>
+  </body>
+</html>

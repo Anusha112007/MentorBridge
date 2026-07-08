@@ -1,0 +1,177 @@
+﻿<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Placement Hub — MentorBridge</title>
+    <meta
+      name="description"
+      content="Read real placement experiences from seniors placed at top companies."
+    />
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/directory.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <!-- Hero Banner -->
+        <div class="welcome-banner animate-fade-in" style="margin-bottom: 24px">
+          <div class="welcome-text">
+            <h1 style="color: #fff; font-size: 1.6rem">🏢 Placement Experience Hub</h1>
+            <p style="color: rgba(255, 255, 255, 0.85)">
+              Real stories from seniors who cracked top companies. Learn what worked for them.
+            </p>
+          </div>
+          <div class="welcome-emoji">🎯</div>
+        </div>
+
+        <!-- Controls -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+          "
+          class="animate-fade-in delay-100"
+        >
+          <div class="search-wrapper" style="flex: 1; min-width: 200px">
+            <span class="search-icon">🔍</span>
+            <input
+              class="search-input"
+              type="text"
+              id="search-input"
+              placeholder="Search by company, role, or keyword..."
+            />
+          </div>
+          <input
+            class="form-input"
+            type="text"
+            id="company-filter"
+            placeholder="🏢 Company"
+            style="width: 160px"
+          />
+          <span style="color: var(--text-muted); font-size: 13px"
+            ><span id="total-count">—</span> experiences</span
+          >
+          <div id="share-section"></div>
+        </div>
+
+        <!-- Company quick filters -->
+        <div
+          style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px"
+          class="animate-fade-in delay-100"
+        >
+          <button class="tag" onclick="filterCompany('Google')">🔍 Google</button>
+          <button class="tag" onclick="filterCompany('Microsoft')">💻 Microsoft</button>
+          <button class="tag" onclick="filterCompany('Infosys')">🏢 Infosys</button>
+          <button class="tag" onclick="filterCompany('TCS')">🏢 TCS</button>
+          <button class="tag" onclick="filterCompany('Wipro')">🏢 Wipro</button>
+          <button class="tag" onclick="filterCompany('Deloitte')">💼 Deloitte</button>
+          <button class="tag" onclick="filterCompany('Accenture')">🌐 Accenture</button>
+          <button class="tag" onclick="filterCompany('Amazon')">📦 Amazon</button>
+        </div>
+
+        <div class="hub-grid animate-fade-in delay-200" id="exp-grid"></div>
+        <div id="pagination"></div>
+      </main>
+    </div>
+
+    <!-- Share Experience Modal -->
+    <div class="modal-overlay" id="share-modal">
+      <div class="modal" style="max-width: 640px">
+        <div class="modal-header">
+          <h3>🏢 Share Placement Experience</h3>
+          <button class="modal-close" id="close-share-modal">✕</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 14px">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+            <div class="form-group">
+              <label class="form-label">Company Name *</label
+              ><input class="form-input" id="exp-company" placeholder="e.g. TCS, Google, Infosys" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role *</label
+              ><input class="form-input" id="exp-role" placeholder="e.g. Software Engineer" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Year *</label
+              ><input class="form-input" type="number" id="exp-year" placeholder="2024" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Package (LPA)</label
+              ><input class="form-input" id="exp-package" placeholder="e.g. 8.5" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label"
+              >Interview Process *
+              <span style="font-size: 11px; color: var(--text-muted)"
+                >(describe the rounds)</span
+              ></label
+            ><textarea
+              class="form-textarea"
+              id="exp-process"
+              rows="4"
+              placeholder="Round 1: Online test (90 min, 60 MCQs)&#10;Round 2: Technical interview..."
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preparation Strategy</label
+            ><textarea
+              class="form-textarea"
+              id="exp-prep"
+              rows="3"
+              placeholder="How did you prepare? Resources used, timeline..."
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tips & Advice</label
+            ><textarea
+              class="form-textarea"
+              id="exp-tips"
+              rows="2"
+              placeholder="What would you tell your junior self?"
+            ></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tags</label
+            ><input
+              class="form-input"
+              id="exp-tags"
+              placeholder="e.g. service-based, coding, HR (comma separated)"
+            />
+          </div>
+          <button class="btn btn-primary btn-full" id="submit-exp">Share Experience 🎉</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script src="js/experiences.js"></script>
+    <script>
+      function filterCompany(name) {
+        const el = document.getElementById('company-filter');
+        if (el) {
+          el.value = name;
+          el.dispatchEvent(new Event('input'));
+        }
+      }
+      // Show share button only for seniors
+      const u = api.getUser();
+      if (u?.role === 'senior') {
+        document.getElementById('share-section').innerHTML =
+          `<button class="btn btn-primary" id="share-btn">📝 Share Your Experience</button>`;
+      }
+      document.getElementById('share-modal')?.addEventListener('click', function (e) {
+        if (e.target === this) this.classList.remove('active');
+      });
+    </script>
+  </body>
+</html>

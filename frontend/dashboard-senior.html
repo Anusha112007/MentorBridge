@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Senior Dashboard — MentorBridge</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/dashboard.css" />
+  </head>
+  <body>
+    <nav class="navbar" id="navbar"></nav>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar"></aside>
+      <main class="main-content">
+        <!-- Welcome -->
+        <div class="welcome-banner animate-fade-in">
+          <div class="welcome-text">
+            <h2>Hello, <span id="user-name">Mentor</span> 🏆</h2>
+            <p>Your mentorship is making a difference. Here's your overview.</p>
+          </div>
+          <div class="welcome-emoji animate-float">🌟</div>
+        </div>
+
+        <!-- 3 stats -->
+        <div class="dashboard-stats animate-fade-in delay-100">
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(108, 99, 255, 0.15)">🤝</div>
+            <div>
+              <div class="dash-stat-value" id="active-mentees">—</div>
+              <div class="dash-stat-label">Active Mentees</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(245, 158, 11, 0.15)">⏳</div>
+            <div>
+              <div class="dash-stat-value" id="pending-reqs">—</div>
+              <div class="dash-stat-label">Pending Requests</div>
+            </div>
+          </div>
+          <div class="dashboard-stat">
+            <div class="dash-stat-icon" style="background: rgba(34, 197, 94, 0.15)">📤</div>
+            <div>
+              <div class="dash-stat-value" id="total-requests">—</div>
+              <div class="dash-stat-label">Total Requests</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two columns -->
+        <div class="two-col-layout animate-fade-in delay-200">
+          <!-- LEFT — Incoming requests -->
+          <div class="card">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 16px;
+              "
+            >
+              <h3 style="font-size: 15px; font-weight: 700">📥 Incoming Requests</h3>
+              <a href="mentorship.html" class="btn btn-ghost btn-sm">View All</a>
+            </div>
+            <div id="incoming-requests">
+              <div
+                style="text-align: center; color: var(--text-muted); padding: 24px; font-size: 13px"
+              >
+                Loading...
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT — Actions + availability -->
+          <div style="display: flex; flex-direction: column; gap: 16px">
+            <!-- Availability -->
+            <div class="card">
+              <div style="display: flex; align-items: center; justify-content: space-between">
+                <div>
+                  <div style="font-size: 14px; font-weight: 700">🟢 Availability</div>
+                  <div
+                    style="font-size: 12px; color: var(--text-muted); margin-top: 4px"
+                    id="avail-label"
+                  >
+                    Checking...
+                  </div>
+                </div>
+                <label style="position: relative; display: inline-block; width: 52px; height: 28px">
+                  <input
+                    type="checkbox"
+                    id="avail-toggle"
+                    style="opacity: 0; width: 0; height: 0"
+                  />
+                  <span
+                    id="avail-slider"
+                    style="
+                      position: absolute;
+                      cursor: pointer;
+                      inset: 0;
+                      background: var(--bg-elevated);
+                      border-radius: 28px;
+                      transition: 0.3s;
+                      border: 1px solid var(--border);
+                    "
+                  ></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Quick actions -->
+            <div class="card">
+              <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 12px">
+                ⚡ Quick Actions
+              </h3>
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <a href="junior-directory.html" class="btn btn-primary btn-sm btn-full"
+                  >🎓 Find &amp; Recruit Juniors</a
+                >
+                <a href="placement-hub.html" class="btn btn-ghost btn-sm btn-full"
+                  >🏢 Placement Experience</a
+                >
+                <a href="internship-hub.html" class="btn btn-ghost btn-sm btn-full"
+                  >💼 Internship Experience</a
+                >
+                <a href="resources.html" class="btn btn-ghost btn-sm btn-full"
+                  >📚 Upload Notes / Resource</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', async () => {
+        const user = requireAuth(['senior']);
+        if (!user) return;
+        renderNavbar();
+        renderSidebar('senior');
+        document.getElementById('user-name').textContent = user.name?.split(' ')[0] || 'Mentor';
+
+        // Availability toggle
+        const toggle = document.getElementById('avail-toggle');
+        const slider = document.getElementById('avail-slider');
+        const label = document.getElementById('avail-label');
+        if (toggle) {
+          toggle.checked = user.availabilityStatus !== false;
+          setSlider(toggle.checked);
+          toggle.addEventListener('change', async () => {
+            setSlider(toggle.checked);
+            try {
+              const fd = new FormData();
+              fd.append('availabilityStatus', toggle.checked);
+              const data = await api.putForm('/users/me', fd);
+              api.setAuth(api.getToken(), data.user);
+              showToast(
+                'success',
+                toggle.checked ? '🟢 Available for mentorship' : '🟡 Set to unavailable'
+              );
+            } catch (e) {
+              showToast('error', 'Failed to update');
+            }
+          });
+        }
+        function setSlider(on) {
+          if (!slider || !label) return;
+          slider.style.background = on ? 'var(--gradient-primary)' : 'var(--bg-elevated)';
+          slider.style.boxShadow = on ? '0 0 12px rgba(108,99,255,0.4)' : 'none';
+          label.textContent = on ? 'Juniors can send you requests' : 'You are marked as busy';
+          label.style.color = on ? 'var(--success)' : 'var(--warning)';
+        }
+
+        // Load requests
+        try {
+          const data = await api.get('/mentorship/my-requests');
+          const requests = data.requests || [];
+          const pending = requests.filter((r) => r.status === 'pending');
+          const accepted = requests.filter((r) => r.status === 'accepted');
+          document.getElementById('active-mentees').textContent = accepted.length;
+          document.getElementById('pending-reqs').textContent = pending.length;
+          document.getElementById('total-requests').textContent = requests.length;
+
+          const el = document.getElementById('incoming-requests');
+          if (!pending.length) {
+            el.innerHTML = `<div class="empty-state" style="padding:16px"><div class="empty-state-icon" style="font-size:2rem">📭</div><h3 style="font-size:14px">No pending requests</h3><p style="font-size:12px;color:var(--text-muted)">You'll see new mentorship requests here</p></div>`;
+          } else {
+            el.innerHTML = pending
+              .slice(0, 5)
+              .map(
+                (r) => `
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-subtle)">
+          ${renderAvatar(r.junior, 'avatar-sm')}
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${r.junior?.name || '—'}</div>
+            <div style="font-size:11px;color:var(--text-muted)">${r.junior?.branch || ''} · Year ${r.junior?.currentYear || ''}</div>
+            ${r.message ? `<div style="font-size:12px;color:var(--text-secondary);margin-top:3px;font-style:italic">"${r.message.slice(0, 70)}${r.message.length > 70 ? '…' : ''}"</div>` : ''}
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-success btn-sm" onclick="respond('${r._id}','accept')">✅</button>
+            <button class="btn btn-danger btn-sm" onclick="respond('${r._id}','reject')">❌</button>
+          </div>
+        </div>`
+              )
+              .join('');
+          }
+        } catch (e) {}
+
+        async function respond(id, action) {
+          try {
+            await api.put(`/mentorship/${id}/${action}`, {});
+            showToast('success', action === 'accept' ? 'Request accepted! 🎉' : 'Request declined');
+            location.reload();
+          } catch (err) {
+            showToast('error', 'Failed', err.message);
+          }
+        }
+        window.respond = respond;
+      });
+    </script>
+  </body>
+</html>

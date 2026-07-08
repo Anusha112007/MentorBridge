@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login / Register — MentorBridge</title>
+    <meta
+      name="description"
+      content="Sign in or create your MentorBridge account to start your mentorship journey."
+    />
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/pages/auth.css" />
+  </head>
+  <body>
+    <div class="auth-page">
+      <!-- Left panel -->
+      <div class="auth-left">
+        <div class="auth-left-content">
+          <a href="index.html" class="auth-brand">
+            <div class="brand-logo">🎓</div>
+            <span>MentorBridge</span>
+          </a>
+          <div class="auth-tagline animate-fade-in">
+            <h1>Your <span class="gradient-text">career journey</span> starts here.</h1>
+            <p>
+              Connect with seniors, get real mentorship, discover placement strategies and resources
+              that actually help you succeed.
+            </p>
+          </div>
+          <div class="auth-features animate-fade-in delay-200">
+            <div class="auth-feature-item">
+              <div class="check">✓</div>
+              Find CSE mentors & tech domains
+            </div>
+            <div class="auth-feature-item">
+              <div class="check">✓</div>
+              Read real placement & internship experiences
+            </div>
+            <div class="auth-feature-item">
+              <div class="check">✓</div>
+              Access curated notes, resources & past papers
+            </div>
+            <div class="auth-feature-item">
+              <div class="check">✓</div>
+              Ask questions anonymously — no judgment
+            </div>
+            <div class="auth-feature-item">
+              <div class="check">✓</div>
+              Direct 1-to-1 messaging with mentors
+            </div>
+          </div>
+
+          <!-- Floating testimonial -->
+          <div class="card card-glass animate-fade-in delay-400" style="margin-top: 32px">
+            <div class="testimonial-stars">★★★★★</div>
+            <p class="testimonial-text">
+              "MentorBridge changed how I prepped for placements. My senior mentor was invaluable!"
+            </p>
+            <div class="testimonial-author">
+              <div class="avatar">AK</div>
+              <div>
+                <div class="testimonial-name">Akash Kumar</div>
+                <div class="testimonial-role">Placed at Infosys · CSE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right panel: Auth form -->
+      <div class="auth-right">
+        <div class="auth-form-box animate-scale-in">
+          <!-- Tabs -->
+          <div class="auth-tabs">
+            <button class="auth-tab active" id="login-tab">Sign In</button>
+            <button class="auth-tab" id="register-tab">Create Account</button>
+          </div>
+
+          <!-- LOGIN FORM -->
+          <div id="login-form" class="tab-content active">
+            <h2 class="auth-form-title">Welcome back 👋</h2>
+            <p class="auth-form-subtitle">Sign in to your MentorBridge account</p>
+            <div class="auth-form">
+              <div class="form-group">
+                <label class="form-label">Email address</label>
+                <div class="input-group">
+                  <span class="input-icon">📧</span>
+                  <input
+                    class="form-input"
+                    type="email"
+                    id="login-email"
+                    placeholder="you@college.edu"
+                    autocomplete="email"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-group" style="position: relative">
+                  <span class="input-icon">🔒</span>
+                  <input
+                    class="form-input"
+                    type="password"
+                    id="login-password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                  />
+                  <button
+                    class="pw-toggle"
+                    type="button"
+                    style="
+                      position: absolute;
+                      right: 14px;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      background: none;
+                      border: none;
+                      cursor: pointer;
+                      color: var(--text-muted);
+                    "
+                  >
+                    👁️
+                  </button>
+                </div>
+              </div>
+              <div style="text-align: right; margin-top: -12px">
+                <a href="#" style="font-size: 13px; color: var(--primary-light)"
+                  >Forgot password?</a
+                >
+              </div>
+              <button class="btn btn-primary btn-lg btn-full" id="login-submit">Sign In</button>
+            </div>
+            <div class="auth-link" style="margin-top: 24px">
+              Don't have an account? <a href="#" id="goto-register">Create one</a>
+            </div>
+          </div>
+
+          <!-- REGISTER FORM -->
+          <div id="register-form" class="tab-content">
+            <h2 class="auth-form-title">Join MentorBridge 🚀</h2>
+            <p class="auth-form-subtitle">Create your free account to get started</p>
+
+            <div style="margin-bottom: 20px">
+              <label class="form-label" style="margin-bottom: 10px; display: block"
+                >I am a...</label
+              >
+              <div class="role-selector">
+                <div class="role-card selected" data-role="junior">
+                  <div class="role-icon">👨‍🎓</div>
+                  <div class="role-name">Junior</div>
+                  <div class="role-desc">Looking for guidance</div>
+                </div>
+                <div class="role-card" data-role="senior">
+                  <div class="role-icon">🏆</div>
+                  <div class="role-name">Senior</div>
+                  <div class="role-desc">Ready to mentor</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="auth-form">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <div class="input-group">
+                  <span class="input-icon">👤</span>
+                  <input
+                    class="form-input"
+                    type="text"
+                    id="reg-name"
+                    placeholder="Your full name"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <div class="input-group">
+                  <span class="input-icon">📧</span>
+                  <input
+                    class="form-input"
+                    type="email"
+                    id="reg-email"
+                    placeholder="you@college.edu"
+                  />
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+                <div class="form-group">
+                  <label class="form-label">Branch *</label>
+                  <input
+                    class="form-input"
+                    type="text"
+                    id="reg-branch"
+                    value="CSE"
+                    readonly
+                    style="background: rgba(255, 255, 255, 0.05); cursor: not-allowed"
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label" id="year-label">Current Year</label>
+                  <select class="form-select" id="reg-year">
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                    <option value="2024">Batch 2024</option>
+                    <option value="2023">Batch 2023</option>
+                    <option value="2022">Batch 2022</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password *</label>
+                <div class="input-group" style="position: relative">
+                  <span class="input-icon">🔒</span>
+                  <input
+                    class="form-input"
+                    type="password"
+                    id="reg-password"
+                    placeholder="Min. 6 characters"
+                  />
+                  <button
+                    class="pw-toggle"
+                    type="button"
+                    style="
+                      position: absolute;
+                      right: 14px;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      background: none;
+                      border: none;
+                      cursor: pointer;
+                      color: var(--text-muted);
+                    "
+                  >
+                    👁️
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-lg btn-full" id="register-submit">
+                Create Account 🎉
+              </button>
+            </div>
+            <div class="auth-link" style="margin-top: 24px; font-size: 12px">
+              By signing up, you agree to our Terms & Privacy Policy.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast-container"></div>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+      // Sync goto-register link
+      document.getElementById('goto-register')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById('register-tab')?.click();
+      });
+
+      // Update year label based on role
+      document.querySelectorAll('.role-card').forEach((card) => {
+        card.addEventListener('click', () => {
+          const label = document.getElementById('year-label');
+          if (!label) return;
+          if (card.dataset.role === 'senior') {
+            label.textContent = 'Graduation Year';
+            const sel = document.getElementById('reg-year');
+            if (sel) {
+              sel.innerHTML =
+                '<option value="2024">2024</option><option value="2023">2023</option><option value="2022">2022</option><option value="2021">2021</option>';
+            }
+          } else {
+            label.textContent = 'Current Year';
+            const sel = document.getElementById('reg-year');
+            if (sel) {
+              sel.innerHTML =
+                '<option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option>';
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
