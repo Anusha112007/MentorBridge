@@ -1,4 +1,4 @@
-﻿# 🎓 MentorBridge — Student Mentorship Platform
+# 🎓 MentorBridge — Student Mentorship Platform
 
 A full-stack web platform connecting college juniors and seniors for mentorship, placement guidance, Q&A, and resource sharing.
 
@@ -123,3 +123,57 @@ Create one by registering normally, then manually update the role in MongoDB:
 ```js
 db.users.updateOne({ email: "admin@example.com" }, { $set: { role: "admin" } })
 ```
+
+---
+
+## 🧹 Code Quality
+
+This project uses **Prettier** and **ESLint** for consistent code style and static analysis.
+
+> Install root devDependencies first (from the project root, **not** `backend/`):
+> ```bash
+> npm install
+> ```
+
+### Format all files
+```bash
+npm run format
+```
+Prettier will auto-format all `.js`, `.html`, `.css`, and `.json` files.
+
+### Check formatting (no changes)
+```bash
+npm run format:check
+```
+
+### Lint all JavaScript
+```bash
+npm run lint
+```
+ESLint checks both the Node.js backend and the browser frontend.
+
+---
+
+## 🔒 Environment Setup
+
+Never commit `.env` — it is listed in `.gitignore`.
+
+1. Copy the example file:
+   ```bash
+   cp backend/.env.example backend/.env
+   ```
+2. Edit `backend/.env` with your values.
+
+---
+
+## 🛠️ Contributing
+
+1. Fork the repo and create a feature branch: `git checkout -b feat/your-feature`
+2. Make your changes
+3. Format and lint before committing:
+   ```bash
+   npm run format && npm run lint
+   ```
+4. Commit with a descriptive message: `git commit -m "feat: add X feature"`
+5. Open a Pull Request
+
