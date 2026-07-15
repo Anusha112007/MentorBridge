@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -8,6 +8,23 @@
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/layout.css" />
     <link rel="stylesheet" href="css/pages/dashboard.css" />
+    <style>
+      .gamified-tip-card {
+        background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.1) 100%);
+        border: 1px solid rgba(168, 85, 247, 0.25) !important;
+        position: relative;
+        overflow: hidden;
+        margin-top: 20px;
+        transition: transform 0.2s, border-color 0.2s;
+      }
+      .gamified-tip-card:hover {
+        border-color: rgba(168, 85, 247, 0.45) !important;
+        transform: translateY(-2px);
+      }
+      .active-glow {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 20px rgba(168, 85, 247, 0.1);
+      }
+    </style>
   </head>
   <body>
     <nav class="navbar" id="navbar"></nav>
@@ -105,6 +122,82 @@
             </div>
             <div style="font-size: 12px; color: var(--text-muted)">Chat with seniors/juniors</div>
           </a>
+        </div>
+
+        <!-- Gamified Tech Tip Widget -->
+        <div
+          id="tech-tip-widget"
+          class="card gamified-tip-card active-glow animate-fade-in delay-150"
+          style="padding: 20px;"
+        >
+          <!-- Header Row -->
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              width: 100%;
+              border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+              padding-bottom: 12px;
+              margin-bottom: 12px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 8px">
+              <span style="font-size: 1.2rem">💡</span>
+              <span
+                style="
+                  font-size: 12px;
+                  font-weight: 800;
+                  color: var(--primary-light);
+                  text-transform: uppercase;
+                  letter-spacing: 0.08em;
+                "
+              >
+                Tech Tip of the Day
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px" id="tip-actions-wrapper">
+              <span
+                id="streak-badge"
+                class="badge badge-warning"
+                style="padding: 4px 10px; font-size: 10px; font-weight: 800; border-radius: 12px; border: none;"
+              >
+                🔥 Streak: 0 Days
+              </span>
+              <button
+                id="btn-claim-xp"
+                class="btn btn-primary"
+                style="
+                  padding: 4px 12px;
+                  font-size: 10px;
+                  border-radius: 12px;
+                  font-weight: 800;
+                  cursor: pointer;
+                  border: none;
+                  outline: none;
+                  line-height: 1.2;
+                "
+              >
+                💎 Claim +10 XP
+              </button>
+            </div>
+          </div>
+
+          <!-- Content Area -->
+          <div style="padding: 4px 0">
+            <p
+              id="techtip-content"
+              style="
+                font-size: 13.5px;
+                font-weight: 600;
+                line-height: 1.6;
+                color: var(--text-primary);
+                margin: 0;
+              "
+            >
+              Loading daily tech tip...
+            </p>
+          </div>
         </div>
 
         <!-- Recent activity -->
@@ -207,6 +300,79 @@
               .join('') ||
             '<div style="color:var(--text-muted);font-size:13px">No resources yet.</div>';
         } catch (e) {}
+
+        // Tech Tips list
+        const TECH_TIPS = [
+          "Use `git commit -am 'message'` to stage and commit all modified files in a single command.",
+          "In Javascript, use `const user = data || {}` to safely prevent 'Cannot read properties of null' errors.",
+          'Write database queries using specific select fields (`SELECT name, email`) instead of `SELECT *` to improve query performance.',
+          'In VS Code, press `Ctrl + P` (or `Cmd + P` on Mac) to quickly search for and open any file in your project.',
+          'Use CSS custom properties (variables like `--primary-color`) to maintain consistent themes across your components.',
+          'Use `console.table()` instead of `console.log()` to print arrays of objects as a clean readable table in your console.',
+          'Always add `alt` descriptions to your image tags. It improves accessibility for screen readers and search engine index rankings.',
+          'In SQL, use indexes on columns that are frequently used in WHERE, JOIN, or ORDER BY clauses to optimize query speeds.',
+          'In Git, use `git checkout -` to quickly switch back to the branch you were previously working on.',
+        ];
+
+        try {
+          const msPerDay = 24 * 60 * 60 * 1000;
+          const epoch = new Date('2026-01-01').getTime();
+          const currentDayIndex = Math.floor((Date.now() - epoch) / msPerDay);
+          const dailyTip = TECH_TIPS[currentDayIndex % TECH_TIPS.length];
+
+          // Populate the tip content immediately
+          document.getElementById('techtip-content').textContent = dailyTip;
+
+          const todayStr = new Date().toISOString().split('T')[0];
+          const lastClaimDate = localStorage.getItem('techTipLastClaimDate');
+          const savedStreak = parseInt(localStorage.getItem('techTipStreak') || '0', 10);
+
+          const claimBtn = document.getElementById('btn-claim-xp');
+          const streakBadge = document.getElementById('streak-badge');
+
+          const updateStreakDisplay = (streak) => {
+            streakBadge.textContent = `🔥 Streak: ${streak} ${streak === 1 ? 'Day' : 'Days'}`;
+          };
+
+          const setClaimedState = () => {
+            if (claimBtn) {
+              claimBtn.outerHTML = `<span class="badge badge-success" style="padding: 4px 10px; font-size: 10px; font-weight: 800; border-radius: 12px; border: none; background: var(--success); color: #fff;">✨ +10 XP Claimed</span>`;
+            }
+          };
+
+          // Setup initial streak display
+          updateStreakDisplay(savedStreak);
+
+          // If already claimed today
+          if (lastClaimDate === todayStr) {
+            setClaimedState();
+          }
+
+          claimBtn?.addEventListener('click', () => {
+            let newStreak = 1;
+
+            if (lastClaimDate) {
+              const yesterday = new Date();
+              yesterday.setDate(yesterday.getDate() - 1);
+              const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+              if (lastClaimDate === yesterdayStr) {
+                newStreak = savedStreak + 1;
+              } else if (lastClaimDate === todayStr) {
+                newStreak = savedStreak;
+              }
+            }
+
+            localStorage.setItem('techTipStreak', newStreak);
+            localStorage.setItem('techTipLastClaimDate', todayStr);
+
+            updateStreakDisplay(newStreak);
+            setClaimedState();
+            showToast('success', 'Streak Updated!', '+10 XP Claimed! Keep the streak alive! 🔥');
+          });
+        } catch (e) {
+          console.error('Failed to initialize gamified tech tip', e);
+        }
       });
     </script>
   </body>

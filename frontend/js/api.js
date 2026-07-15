@@ -215,6 +215,7 @@ function renderSidebar(role) {
       <div class="sidebar-divider"></div>
       <a href="doubts.html"     class="sidebar-link"><span class="link-icon">❓</span>Doubts</a>
       <a href="resources.html"  class="sidebar-link"><span class="link-icon">📚</span>Resources</a>
+      <a href="subject-guidance.html" class="sidebar-link"><span class="link-icon">📖</span>Subject Guidance</a>
       <a href="messages.html"   class="sidebar-link"><span class="link-icon">✉️</span>Messages</a>
       <div class="sidebar-divider"></div>
       <a href="edit-profile.html" class="sidebar-link"><span class="link-icon">✏️</span>Edit Profile</a>
