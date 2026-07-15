@@ -357,21 +357,34 @@ window.addEventListener('scroll', () => {
     }, 6000);
   }
 
+  const originalTitle = document.title;
+
   function updateMessageBadge(count) {
     // Remove existing badges first
     document.querySelectorAll('.msg-badge').forEach((b) => b.remove());
-    if (count <= 0) return;
+    
+    if (count <= 0) {
+      document.title = originalTitle;
+      return;
+    }
 
-    // Add badge to Messages links in navbar and sidebar
+    // Update document tab title with notification count prefix
+    document.title = `(${count}) ${originalTitle}`;
+
+    // Add badge to Messages links in navbar and sidebar as a superscript
     document.querySelectorAll('a[href="messages.html"]').forEach((link) => {
-      const badge = document.createElement('span');
+      const badge = document.createElement('sup');
       badge.className = 'msg-badge';
-      badge.textContent = count > 9 ? '9+' : count;
+      badge.textContent = count;
       badge.style.cssText = `
-        display:inline-flex;align-items:center;justify-content:center;
-        background:#ef4444;color:#fff;border-radius:999px;
-        font-size:10px;font-weight:700;min-width:16px;height:16px;
-        padding:0 4px;margin-left:6px;vertical-align:middle;
+        background: #ef4444;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 8px;
+        font-weight: 800;
+        padding: 2px 5px;
+        margin-left: 2px;
+        vertical-align: super;
       `;
       link.appendChild(badge);
     });
