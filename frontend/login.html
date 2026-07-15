@@ -29,40 +29,120 @@
               that actually help you succeed.
             </p>
           </div>
-          <div class="auth-features animate-fade-in delay-200">
-            <div class="auth-feature-item">
-              <div class="check">✓</div>
-              Find CSE mentors & tech domains
-            </div>
-            <div class="auth-feature-item">
-              <div class="check">✓</div>
-              Read real placement & internship experiences
-            </div>
-            <div class="auth-feature-item">
-              <div class="check">✓</div>
-              Access curated notes, resources & past papers
-            </div>
-            <div class="auth-feature-item">
-              <div class="check">✓</div>
-              Ask questions anonymously — no judgment
-            </div>
-            <div class="auth-feature-item">
-              <div class="check">✓</div>
-              Direct 1-to-1 messaging with mentors
-            </div>
-          </div>
+          <!-- Mentor Connection Bridge Graphic -->
+          <div class="mentor-bridge-card animate-fade-in delay-400">
+            <!-- Background futuristic grid -->
+            <div class="card-grid-bg"></div>
+            
+            <div class="bridge-title">🎓 Mentor Connection Bridge</div>
+            <div class="bridge-container">
+              <!-- Junior node (representing junior student) -->
+              <div class="bridge-node junior-node">
+                <!-- Portal Rotating Rings -->
+                <div class="portal-ring-outer"></div>
+                <div class="portal-ring-inner"></div>
+                <div class="node-avatar-wrapper">
+                  <img src="images/junior_avatar.png" alt="Junior Student" class="node-avatar">
+                  <span class="node-emoji">👨‍🎓</span>
+                </div>
+                <div class="node-info">
+                  <span class="node-label">Junior Student</span>
+                  <span class="node-sub">Seeking Guidance</span>
+                </div>
+              </div>
 
-          <!-- Floating testimonial -->
-          <div class="card card-glass animate-fade-in delay-400" style="margin-top: 32px">
-            <div class="testimonial-stars">★★★★★</div>
-            <p class="testimonial-text">
-              "MentorBridge changed how I prepped for placements. My senior mentor was invaluable!"
-            </p>
-            <div class="testimonial-author">
-              <div class="avatar">AK</div>
-              <div>
-                <div class="testimonial-name">Akash Kumar</div>
-                <div class="testimonial-role">Placed at Infosys · CSE</div>
+              <!-- Bridging Lines -->
+              <div class="bridge-lines">
+                <svg width="100%" height="100%" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+                  <!-- Curve 1: Primary glowing line (Cyan/Indigo Gradient) -->
+                  <path class="laser-path-glow" d="M 25 75 C 75 75, 125 25, 175 25" stroke="url(#laser-grad-1)" stroke-width="5" />
+                  <path class="laser-path laser-path-dash" d="M 25 75 C 75 75, 125 25, 175 25" stroke="url(#laser-grad-1)" stroke-width="2.5" />
+                  
+                  <!-- Curve 2: Secondary offset line representing back-and-forth guidance (Green/Amber Gradient) -->
+                  <path class="laser-path-glow" d="M 25 75 C 65 95, 135 5, 175 25" stroke="url(#laser-grad-2)" stroke-width="4" opacity="0.5" />
+                  <path class="laser-path laser-path-dash-reverse" d="M 25 75 C 65 95, 135 5, 175 25" stroke="url(#laser-grad-2)" stroke-width="1.5" />
+                  
+                  <!-- Dynamic Floating Transaction Emojis/Symbols (moving along the main curve) -->
+                  
+                  <!-- Particle 1: Purple Glowing Pulse -->
+                  <circle r="5" fill="#818cf8">
+                    <animateMotion dur="4.5s" repeatCount="indefinite" path="M 25 75 C 75 75, 125 25, 175 25" />
+                    <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite" />
+                  </circle>
+                  
+                  <!-- Particle 2: Emerald Guidance Spark -->
+                  <circle r="4.5" fill="#34d399">
+                    <animateMotion dur="3.5s" repeatCount="indefinite" path="M 25 75 C 65 95, 135 5, 175 25" begin="1s" />
+                    <animate attributeName="opacity" values="0.2;1;0.2" dur="3.5s" repeatCount="indefinite" />
+                  </circle>
+
+                  <!-- Particle 3: Amber Question Spark -->
+                  <circle r="4" fill="#fbbf24">
+                    <animateMotion dur="5.5s" repeatCount="indefinite" path="M 25 75 C 75 75, 125 25, 175 25" begin="2s" />
+                  </circle>
+
+                  <!-- Dynamic Floating Text Tags -->
+                  <!-- Doubt Tag -->
+                  <g class="svg-float-text">
+                    <rect x="-42" y="-12" width="84" height="20" class="svg-text-bg" />
+                    <text x="0" y="2" font-size="8" fill="#e0e7ff" font-weight="700" text-anchor="middle">
+                      Doubt Asked ❓
+                    </text>
+                    <animateMotion dur="8s" repeatCount="indefinite" path="M 25 75 C 75 75, 125 25, 175 25" begin="0.5s" />
+                    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.05;0.2;0.7;0.85;1" dur="8s" repeatCount="indefinite" begin="0.5s" />
+                  </g>
+
+                  <!-- Mentorship/Guidance Tag -->
+                  <g class="svg-float-text">
+                    <rect x="-48" y="-12" width="96" height="20" class="svg-text-bg svg-text-bg-emerald" />
+                    <text x="0" y="2" font-size="8" fill="#ecfdf5" font-weight="700" text-anchor="middle">
+                      Guidance Shared 🧑‍🏫
+                    </text>
+                    <animateMotion dur="8s" repeatCount="indefinite" path="M 175 25 C 135 5, 65 95, 25 75" begin="3s" />
+                    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.05;0.2;0.7;0.85;1" dur="8s" repeatCount="indefinite" begin="3s" />
+                  </g>
+
+                  <!-- Success/Placement Tag -->
+                  <g class="svg-float-text">
+                    <rect x="-45" y="-12" width="90" height="20" class="svg-text-bg svg-text-bg-amber" />
+                    <text x="0" y="2" font-size="8" fill="#fffbeb" font-weight="700" text-anchor="middle">
+                      Placed at Google 🚀
+                    </text>
+                    <animateMotion dur="8s" repeatCount="indefinite" path="M 25 75 C 75 75, 125 25, 175 25" begin="5.5s" />
+                    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.05;0.2;0.7;0.85;1" dur="8s" repeatCount="indefinite" begin="5.5s" />
+                  </g>
+
+                  <!-- Definitions -->
+                  <defs>
+                    <!-- Laser Gradient 1 (Indigo to Cyan) -->
+                    <linearGradient id="laser-grad-1" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#4f46e5" />
+                      <stop offset="50%" stop-color="#818cf8" />
+                      <stop offset="100%" stop-color="#06b6d4" />
+                    </linearGradient>
+                    <!-- Laser Gradient 2 (Emerald to Amber) -->
+                    <linearGradient id="laser-grad-2" x1="0%" y1="100%" x2="100%" y2="0%">
+                      <stop offset="0%" stop-color="#10b981" />
+                      <stop offset="60%" stop-color="#34d399" />
+                      <stop offset="100%" stop-color="#fbbf24" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              <!-- Senior node (representing senior student) -->
+              <div class="bridge-node senior-node">
+                <!-- Portal Rotating Rings -->
+                <div class="portal-ring-outer"></div>
+                <div class="portal-ring-inner"></div>
+                <div class="node-avatar-wrapper">
+                  <img src="images/senior_avatar.png" alt="Senior Mentor" class="node-avatar">
+                  <span class="node-emoji">🏆</span>
+                </div>
+                <div class="node-info">
+                  <span class="node-label">Senior Mentor</span>
+                  <span class="node-sub">Sharing Experience</span>
+                </div>
               </div>
             </div>
           </div>

@@ -243,6 +243,294 @@
 }
 
 /* =====================================================
+   Mentor Connection Bridge Graphic (Futuristic Upgrade)
+   ===================================================== */
+.mentor-bridge-card {
+  margin-top: 36px;
+  background: radial-gradient(circle at top left, rgba(25, 25, 50, 0.8), rgba(14, 14, 28, 0.95));
+  border: 1px solid rgba(129, 140, 248, 0.25);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 0 20px rgba(79, 70, 229, 0.1);
+  backdrop-filter: blur(12px);
+  transition: all 0.4s var(--ease-out);
+}
+
+.mentor-bridge-card:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 
+    0 24px 48px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(16, 185, 129, 0.15),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  transform: translateY(-2px);
+}
+
+/* Background Tech Grid Pattern */
+.card-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(79, 70, 229, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79, 70, 229, 0.04) 1px, transparent 1px);
+  background-size: 20px 20px;
+  mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bridge-title {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: var(--primary-light);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+  position: relative;
+}
+
+.bridge-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(129, 140, 248, 0.3) 0%, transparent 100%);
+}
+
+.bridge-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  height: 160px;
+  padding: 0 5px;
+  z-index: 1;
+}
+
+/* Bobbing Nodes representing floating portal points */
+.bridge-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  position: relative;
+}
+
+.junior-node {
+  align-self: flex-end;
+  animation: bob-junior 5s ease-in-out infinite;
+}
+
+.senior-node {
+  align-self: flex-start;
+  animation: bob-senior 5.5s ease-in-out infinite;
+}
+
+@keyframes bob-junior {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes bob-senior {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+
+/* Portal Rotating Rings */
+.portal-ring-outer {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 1px dashed rgba(129, 140, 248, 0.4);
+  animation: spin-clockwise 20s linear infinite;
+  pointer-events: none;
+}
+
+.portal-ring-inner {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px dotted rgba(16, 185, 129, 0.5);
+  animation: spin-counter 12s linear infinite;
+  pointer-events: none;
+}
+
+.senior-node .portal-ring-outer {
+  border-color: rgba(16, 185, 129, 0.4);
+  animation: spin-counter 24s linear infinite;
+}
+
+.senior-node .portal-ring-inner {
+  border-color: rgba(6, 182, 212, 0.5);
+  animation: spin-clockwise 14s linear infinite;
+}
+
+@keyframes spin-clockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-counter {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.node-avatar-wrapper {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  padding: 3px;
+  z-index: 2;
+  transition: transform var(--transition);
+}
+
+.junior-node .node-avatar-wrapper {
+  background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+  box-shadow: 0 0 20px rgba(79, 70, 229, 0.35);
+}
+
+.senior-node .node-avatar-wrapper {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+}
+
+.node-avatar-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: inherit;
+  z-index: -1;
+  opacity: 0.35;
+  filter: blur(8px);
+  transition: opacity 0.3s;
+}
+
+.bridge-node:hover .node-avatar-wrapper::after {
+  opacity: 0.7;
+}
+
+.node-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 2.5px solid var(--bg-card);
+}
+
+.node-emoji {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow-md);
+  z-index: 3;
+}
+
+.node-info {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.node-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: 0.3px;
+}
+
+.node-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+
+/* SVG Bridge lines styling */
+.bridge-lines {
+  position: absolute;
+  left: 72px;
+  right: 72px;
+  top: 10px;
+  bottom: 20px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.laser-path {
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px rgba(129, 140, 248, 0.5));
+}
+
+.laser-path-glow {
+  stroke-linecap: round;
+  filter: blur(3px);
+  opacity: 0.35;
+}
+
+.laser-path-dash {
+  stroke-dasharray: 6 12;
+  animation: laser-flow-forward 15s linear infinite;
+}
+
+.laser-path-dash-reverse {
+  stroke-dasharray: 4 10;
+  animation: laser-flow-backward 12s linear infinite;
+}
+
+@keyframes laser-flow-forward {
+  to { stroke-dashoffset: -360; }
+}
+
+@keyframes laser-flow-backward {
+  to { stroke-dashoffset: 360; }
+}
+
+/* Dynamic floating tags style */
+.svg-float-text {
+  font-family: var(--font-sans);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  letter-spacing: 0.5px;
+}
+
+.svg-text-bg {
+  fill: rgba(14, 14, 28, 0.9);
+  stroke: rgba(129, 140, 248, 0.3);
+  stroke-width: 1px;
+  rx: 8px;
+  ry: 8px;
+}
+
+.svg-text-bg-emerald {
+  stroke: rgba(16, 185, 129, 0.3);
+}
+
+.svg-text-bg-amber {
+  stroke: rgba(245, 158, 11, 0.3);
+}
+
+/* =====================================================
    Responsive Auth
    ===================================================== */
 @media (max-width: 900px) {
