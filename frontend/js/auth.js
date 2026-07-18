@@ -1,65 +1,19 @@
 /* Auth page JS */
 document.addEventListener('DOMContentLoaded', () => {
+  // If already logged in, redirect
   if (api.isLoggedIn()) {
     const user = api.getUser();
-    if (user?.role === 'junior') location.href = 'dashboard-junior.html';
-    else if (user?.role === 'senior') location.href = 'dashboard-senior.html';
+    if (user?.role === 'junior' || user?.role === 'senior') location.href = 'dashboard.html';
     else location.href = 'dashboard-admin.html';
     return;
   }
 
-  // Tab switching
-  const loginTab = document.getElementById('login-tab');
-  const registerTab = document.getElementById('register-tab');
-  const loginForm = document.getElementById('login-form');
-  const registerForm = document.getElementById('register-form');
-
-  function showTab(tab) {
-    if (tab === 'login') {
-      loginTab.classList.add('active');
-      registerTab.classList.remove('active');
-      loginForm.classList.add('active');
-      registerForm.classList.remove('active');
-    } else {
-      registerTab.classList.add('active');
-      loginTab.classList.remove('active');
-      registerForm.classList.add('active');
-      loginForm.classList.remove('active');
-    }
-  }
-
-  loginTab?.addEventListener('click', () => showTab('login'));
-  registerTab?.addEventListener('click', () => showTab('register'));
-
-  // Check URL hash
-  if (window.location.hash === '#register') showTab('register');
-
-  // Role selection
-  let selectedRole = 'junior';
-  document.querySelectorAll('.role-card').forEach((card) => {
-    card.addEventListener('click', () => {
-      document.querySelectorAll('.role-card').forEach((c) => c.classList.remove('selected'));
-      card.classList.add('selected');
-      selectedRole = card.dataset.role;
-    });
-  });
-  document.querySelector('.role-card[data-role="junior"]')?.classList.add('selected');
-
-  // Password toggle
-  document.querySelectorAll('.pw-toggle').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const input = btn.previousElementSibling;
-      if (!input) return;
-      input.type = input.type === 'password' ? 'text' : 'password';
-      btn.textContent = input.type === 'password' ? '👁️' : '🙈';
-    });
-  });
-
-  // Login
+  // ── Login Submit ──
   document.getElementById('login-submit')?.addEventListener('click', async () => {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const btn = document.getElementById('login-submit');
+
     if (!email || !password) {
       showToast('warning', 'Fill in all fields');
       return;
@@ -72,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
       api.setAuth(data.token, data.user);
       showToast('success', 'Welcome back!', `Logged in as ${data.user.name}`);
       setTimeout(() => {
-        if (data.user.role === 'junior') location.href = 'dashboard-junior.html';
-        else if (data.user.role === 'senior') location.href = 'dashboard-senior.html';
+        if (data.user.role === 'junior' || data.user.role === 'senior')
+          location.href = 'dashboard.html';
         else location.href = 'dashboard-admin.html';
       }, 800);
     } catch (err) {
@@ -83,8 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Register
+  // Enter key on login password
+  document.getElementById('login-password')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('login-submit')?.click();
+  });
+
+  // ── Register Submit ──
   document.getElementById('register-submit')?.addEventListener('click', async () => {
+    // selectedRole is set by the inline script in login.html via window.selectedRole
+    const role =
+      window.selectedRole || document.querySelector('.role-hero-card.selected')?.dataset.role;
     const name = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim();
     const password = document.getElementById('reg-password').value;
@@ -92,6 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const year = document.getElementById('reg-year')?.value;
     const btn = document.getElementById('register-submit');
 
+    if (!role) {
+      showToast('warning', 'Please select your role first');
+      return;
+    }
     if (!name || !email || !password || !branch) {
       showToast('warning', 'Fill all required fields');
       return;
@@ -101,17 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const body = { name, email, password, role: selectedRole, branch };
-    if (selectedRole === 'junior') {
+    const body = { name, email, password, role, branch };
+    if (role === 'junior') {
       body.currentYear = Number(year) || 1;
     }
-    if (selectedRole === 'senior') {
+    if (role === 'senior') {
       const yearVal = Number(year) || 0;
-      // Values 2, 3, 4 = currently studying senior (2nd/3rd/4th year)
       if (yearVal >= 2 && yearVal <= 4) {
         body.currentYear = yearVal;
       } else {
-        // 4-digit batch year (e.g. 2022–2026) = graduated/graduating alumni
         body.graduationYear = yearVal || new Date().getFullYear();
       }
     }
@@ -123,21 +87,18 @@ document.addEventListener('DOMContentLoaded', () => {
       api.setAuth(data.token, data.user);
       showToast('success', 'Account created!', `Welcome, ${data.user.name}!`);
       setTimeout(() => {
-        if (data.user.role === 'junior') location.href = 'dashboard-junior.html';
-        else if (data.user.role === 'senior') location.href = 'dashboard-senior.html';
+        if (data.user.role === 'junior' || data.user.role === 'senior')
+          location.href = 'dashboard.html';
         else location.href = 'dashboard-admin.html';
       }, 800);
     } catch (err) {
       showToast('error', 'Registration failed', err.message);
       btn.disabled = false;
-      btn.textContent = 'Create Account';
+      btn.textContent = 'Create Account 🎉';
     }
   });
 
-  // Enter key support
-  document.getElementById('login-password')?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') document.getElementById('login-submit')?.click();
-  });
+  // Enter key on reg password
   document.getElementById('reg-password')?.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') document.getElementById('register-submit')?.click();
   });

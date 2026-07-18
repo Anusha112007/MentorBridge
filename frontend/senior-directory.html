@@ -20,68 +20,52 @@
       <main class="main-content">
         <div class="page-header animate-fade-in">
           <h1>🔍 Find Your Mentor</h1>
-          <p>Connect with seniors who can guide your career journey</p>
+          <p style="color: var(--text-secondary); margin-top: 6px; max-width: 600px">
+            Connect with experienced seniors who can guide you in coding, projects, placements, and
+            career preparation.
+          </p>
         </div>
 
-        <!-- Filters -->
-        <div class="card animate-fade-in" style="margin-bottom: 20px">
-          <div
-            style="
-              display: grid;
-              grid-template-columns: 1fr repeat(4, auto) auto;
-              gap: 12px;
-              align-items: end;
-              flex-wrap: wrap;
-            "
-          >
-            <div class="search-wrapper">
+        <!-- Prominent Search Bar -->
+        <div class="card animate-fade-in" style="margin-bottom: 20px; padding: 16px">
+          <div style="display: flex; gap: 12px; align-items: center">
+            <div class="search-wrapper" style="flex: 1; margin: 0">
               <span class="search-icon">🔍</span>
               <input
                 class="search-input"
                 type="text"
                 id="search-input"
-                placeholder="Search by name, skill, domain..."
+                placeholder="Search mentors by name or technical skill (e.g. Python, Web Dev, DSA)..."
+                style="height: 44px"
               />
-            </div>
-            <div class="form-group" style="min-width: 130px; display: none">
-              <label class="form-label">Branch</label>
-              <input class="form-input" type="text" id="branch-filter" placeholder="e.g. CSE" />
-            </div>
-            <div class="form-group" style="min-width: 130px">
-              <label class="form-label">Domain / Expertise</label>
-              <input class="form-input" type="text" id="domain-filter" placeholder="e.g. Web Dev" />
-            </div>
-            <div class="form-group" style="min-width: 130px">
-              <label class="form-label">Company</label>
-              <input class="form-input" type="text" id="company-filter" placeholder="e.g. Google" />
-            </div>
-            <div class="form-group" style="min-width: 120px">
-              <label class="form-label">Skill</label>
-              <input class="form-input" type="text" id="skill-filter" placeholder="e.g. Python" />
             </div>
             <button
               class="btn btn-secondary btn-sm"
               id="clear-filters"
-              style="align-self: flex-end; height: 42px"
+              style="height: 44px; padding: 0 16px; border-radius: 10px"
             >
               ✕ Clear
             </button>
           </div>
         </div>
 
-        <!-- Quick filters -->
-        <div
-          style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px"
-          class="animate-fade-in delay-100"
-        >
-          <span style="font-size: 13px; color: var(--text-muted); align-self: center">Quick:</span>
-          <button class="tag" onclick="quickFilter('domain', 'Web Development')">🌐 Web Dev</button>
-          <button class="tag" onclick="quickFilter('domain', 'DSA')">⚡ DSA</button>
-          <button class="tag" onclick="quickFilter('domain', 'AI/ML')">🤖 AI/ML</button>
-          <button class="tag" onclick="quickFilter('company', 'Google')">🔍 Google</button>
-          <button class="tag" onclick="quickFilter('company', 'Infosys')">🏢 Infosys</button>
-          <button class="tag" onclick="quickFilter('company', 'TCS')">🏢 TCS</button>
-          <button class="tag" onclick="quickFilter('company', 'Wipro')">🏢 Wipro</button>
+        <!-- Dynamic scrollable filter pills -->
+        <div class="filter-pills-container animate-fade-in delay-100" id="filter-pills">
+          <button class="filter-pill active" data-filter="">🔥 All Expertise</button>
+          <button class="filter-pill" data-filter="DSA">⚡ DSA</button>
+          <button class="filter-pill" data-filter="Web Development">🌐 Web Dev</button>
+          <button class="filter-pill" data-filter="AI/ML">🤖 AI/ML</button>
+          <button class="filter-pill" data-filter="Data Science">📊 Data Science</button>
+          <button class="filter-pill" data-filter="Cybersecurity">🛡️ Cybersecurity</button>
+          <button class="filter-pill" data-filter="Cloud Computing">☁️ Cloud Computing</button>
+          <button class="filter-pill" data-filter="Competitive Programming">
+            🏆 Competitive Prog
+          </button>
+          <button class="filter-pill" data-filter="Python">🐍 Python</button>
+          <button class="filter-pill" data-filter="Java">☕ Java</button>
+          <button class="filter-pill" data-filter="Resume Review">📄 Resume Review</button>
+          <button class="filter-pill" data-filter="Interview Preparation">💼 Interview Prep</button>
+          <button class="filter-pill" data-filter="Aptitude">🧠 Aptitude</button>
         </div>
 
         <!-- Results header -->
@@ -106,18 +90,39 @@
         <div id="pagination"></div>
       </main>
     </div>
+
+    <!-- Detailed Mentor Profile Modal -->
+    <div class="modal-overlay" id="mentor-detail-modal">
+      <div class="mentor-modal-content">
+        <div
+          class="modal-header"
+          style="border-bottom: none; padding-bottom: 0; margin-bottom: 8px"
+        >
+          <h3
+            style="
+              font-size: 12px;
+              font-weight: 800;
+              text-transform: uppercase;
+              color: var(--text-muted);
+            "
+          >
+            Mentor Profile Spotlight
+          </h3>
+          <button
+            class="modal-close"
+            onclick="document.getElementById('mentor-detail-modal').classList.remove('active')"
+          >
+            ✕
+          </button>
+        </div>
+        <div id="mentor-modal-body">
+          <!-- Populated dynamically by JS -->
+        </div>
+      </div>
+    </div>
+
     <div id="toast-container"></div>
     <script src="js/api.js"></script>
     <script src="js/directory.js"></script>
-    <script>
-      function quickFilter(type, value) {
-        const map = { domain: 'domain-filter', company: 'company-filter', skills: 'skill-filter' };
-        const el = document.getElementById(map[type]);
-        if (el) {
-          el.value = value;
-          el.dispatchEvent(new Event('input'));
-        }
-      }
-    </script>
   </body>
 </html>

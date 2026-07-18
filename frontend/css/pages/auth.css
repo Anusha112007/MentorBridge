@@ -2,7 +2,7 @@
    Auth Page CSS
    ===================================================== */
 .auth-page {
-  min-height: 100vh;
+  height: 100vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
@@ -13,9 +13,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-12) var(--space-10);
+  padding: var(--space-8) var(--space-10);
   position: relative;
   overflow: hidden;
+  height: 100vh;
 }
 
 .auth-left::before {
@@ -30,7 +31,7 @@
 .auth-left-content {
   position: relative;
   z-index: 1;
-  max-width: 460px;
+  max-width: 500px;
   width: 100%;
 }
 
@@ -111,12 +112,59 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-10);
+  padding: var(--space-8) var(--space-10);
+  height: 100vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.auth-right::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 70% 30%, rgba(16, 185, 129, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 30% 80%, rgba(108, 99, 255, 0.1) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.auth-right::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(108, 99, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 99, 255, 0.02) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 90%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .auth-form-box {
   width: 100%;
-  max-width: 440px;
+  max-width: 480px;
+  background: rgba(20, 20, 42, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 40px;
+  box-shadow:
+    var(--shadow-lg),
+    0 0 40px rgba(79, 70, 229, 0.04);
+  position: relative;
+  z-index: 1;
+}
+
+[data-theme='light'] .auth-form-box {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: rgba(79, 70, 229, 0.15);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.03),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
 }
 
 .auth-tabs {
@@ -124,7 +172,7 @@
   background: var(--bg-elevated);
   border-radius: var(--radius-lg);
   padding: var(--space-1);
-  margin-bottom: var(--space-8);
+  margin-bottom: 16px;
 }
 
 .auth-tab {
@@ -243,54 +291,52 @@
 }
 
 /* =====================================================
-   Mentor Connection Bridge Graphic (Futuristic Upgrade)
+   Mentor Connection Bridge Graphic — Clean Professional
    ===================================================== */
 .mentor-bridge-card {
-  margin-top: 36px;
-  background: radial-gradient(circle at top left, rgba(25, 25, 50, 0.8), rgba(14, 14, 28, 0.95));
-  border: 1px solid rgba(129, 140, 248, 0.25);
-  border-radius: var(--radius-xl);
-  padding: 28px;
+  margin-top: 24px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(200, 205, 230, 0.7);
+  border-radius: 20px;
+  padding: 24px 28px 28px;
   position: relative;
-  overflow: hidden;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.4),
-    0 1px 0 rgba(255, 255, 255, 0.05) inset,
-    0 0 20px rgba(79, 70, 229, 0.1);
-  backdrop-filter: blur(12px);
+  overflow: visible;
+  box-shadow:
+    0 4px 24px rgba(100, 100, 180, 0.08),
+    0 1px 4px rgba(100, 100, 180, 0.06);
   transition: all 0.4s var(--ease-out);
 }
 
-.mentor-bridge-card:hover {
-  border-color: rgba(16, 185, 129, 0.4);
-  box-shadow: 
-    0 24px 48px rgba(0, 0, 0, 0.5),
-    0 0 30px rgba(16, 185, 129, 0.15),
-    0 1px 0 rgba(255, 255, 255, 0.08) inset;
-  transform: translateY(-2px);
+[data-theme='dark'] .mentor-bridge-card {
+  background: rgba(30, 30, 50, 0.92);
+  border-color: rgba(80, 80, 140, 0.4);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Background Tech Grid Pattern */
 .card-grid-bg {
   position: absolute;
   inset: 0;
-  background-image: 
-    linear-gradient(rgba(79, 70, 229, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(79, 70, 229, 0.04) 1px, transparent 1px);
-  background-size: 20px 20px;
-  mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
-  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+  background-image:
+    linear-gradient(rgba(108, 99, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(108, 99, 255, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
   pointer-events: none;
   z-index: 0;
+  border-radius: 20px;
 }
 
 .bridge-title {
-  font-size: var(--text-xs);
+  font-size: 11px;
   text-transform: uppercase;
-  font-weight: 900;
-  letter-spacing: 1.5px;
-  color: var(--primary-light);
-  margin-bottom: 24px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  color: #6366f1;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -302,7 +348,11 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, rgba(129, 140, 248, 0.3) 0%, transparent 100%);
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.3) 0%, transparent 100%);
+}
+
+[data-theme='dark'] .bridge-title {
+  color: #818cf8;
 }
 
 .bridge-container {
@@ -310,12 +360,12 @@
   justify-content: space-between;
   align-items: center;
   position: relative;
-  height: 160px;
-  padding: 0 5px;
+  height: 230px;
+  padding: 0 4px;
   z-index: 1;
 }
 
-/* Bobbing Nodes representing floating portal points */
+/* Nodes */
 .bridge-node {
   display: flex;
   flex-direction: column;
@@ -335,30 +385,40 @@
 }
 
 @keyframes bob-junior {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
 
 @keyframes bob-senior {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
 }
 
-/* Portal Rotating Rings */
+/* Circular Glow Rings */
 .portal-ring-outer {
   position: absolute;
-  inset: -8px;
+  inset: -14px;
   border-radius: 50%;
-  border: 1px dashed rgba(129, 140, 248, 0.4);
+  border: 1.5px dashed rgba(99, 102, 241, 0.35);
   animation: spin-clockwise 20s linear infinite;
   pointer-events: none;
 }
 
 .portal-ring-inner {
   position: absolute;
-  inset: -4px;
+  inset: -6px;
   border-radius: 50%;
-  border: 1.5px dotted rgba(16, 185, 129, 0.5);
+  border: 1.5px dashed rgba(99, 102, 241, 0.2);
   animation: spin-counter 12s linear infinite;
   pointer-events: none;
 }
@@ -369,25 +429,34 @@
 }
 
 .senior-node .portal-ring-inner {
-  border-color: rgba(6, 182, 212, 0.5);
+  border-color: rgba(16, 185, 129, 0.2);
   animation: spin-clockwise 14s linear infinite;
 }
 
 @keyframes spin-clockwise {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes spin-counter {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
 }
 
+/* Avatar wrappers */
 .node-avatar-wrapper {
   position: relative;
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
+  width: 96px;
+  height: 96px;
+  border-radius: 14px;
   padding: 3px;
   z-index: 2;
   transition: transform var(--transition);
@@ -395,139 +464,156 @@
 
 .junior-node .node-avatar-wrapper {
   background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
-  box-shadow: 0 0 20px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 0 24px rgba(79, 70, 229, 0.3);
 }
 
 .senior-node .node-avatar-wrapper {
   background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.35);
+  box-shadow: 0 0 24px rgba(16, 185, 129, 0.3);
 }
 
 .node-avatar-wrapper::after {
   content: '';
   position: absolute;
   inset: -4px;
-  border-radius: 50%;
+  border-radius: 14px;
   background: inherit;
   z-index: -1;
-  opacity: 0.35;
-  filter: blur(8px);
+  opacity: 0.3;
+  filter: blur(10px);
   transition: opacity 0.3s;
 }
 
 .bridge-node:hover .node-avatar-wrapper::after {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .node-avatar {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 50%;
-  background: var(--bg-surface);
-  border: 2.5px solid var(--bg-card);
+  border-radius: 12px;
+  background: #f1f5f9;
+  border: 2px solid rgba(255, 255, 255, 0.8);
 }
 
 .node-emoji {
   position: absolute;
-  bottom: -4px;
-  right: -4px;
-  background: var(--bg-elevated);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  bottom: -6px;
+  right: -6px;
+  background: #fff;
+  border: 1px solid rgba(200, 205, 230, 0.8);
   border-radius: 50%;
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
-  box-shadow: var(--shadow-md);
+  font-size: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   z-index: 3;
 }
 
+[data-theme='dark'] .node-emoji {
+  background: #1e1e32;
+  border-color: rgba(80, 80, 140, 0.5);
+}
+
 .node-info {
-  margin-top: 12px;
+  margin-top: 14px;
   text-align: center;
 }
 
 .node-label {
   display: block;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
-  color: var(--text-primary);
-  letter-spacing: 0.3px;
+  color: #1e293b;
+  letter-spacing: 0.2px;
+}
+
+[data-theme='dark'] .node-label {
+  color: #e2e8f0;
 }
 
 .node-sub {
   display: block;
-  font-size: 11px;
-  color: var(--text-secondary);
+  font-size: 12px;
+  color: #64748b;
   font-weight: 500;
   margin-top: 2px;
-  opacity: 0.85;
 }
 
-/* SVG Bridge lines styling */
+[data-theme='dark'] .node-sub {
+  color: #94a3b8;
+}
+
+/* SVG bridge container */
 .bridge-lines {
   position: absolute;
-  left: 72px;
-  right: 72px;
+  left: 96px;
+  right: 96px;
   top: 10px;
   bottom: 20px;
   z-index: 1;
   pointer-events: none;
+  overflow: visible;
 }
 
-.laser-path {
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 3px rgba(129, 140, 248, 0.5));
-}
-
-.laser-path-glow {
-  stroke-linecap: round;
-  filter: blur(3px);
-  opacity: 0.35;
-}
-
-.laser-path-dash {
-  stroke-dasharray: 6 12;
-  animation: laser-flow-forward 15s linear infinite;
-}
-
-.laser-path-dash-reverse {
-  stroke-dasharray: 4 10;
-  animation: laser-flow-backward 12s linear infinite;
-}
-
-@keyframes laser-flow-forward {
-  to { stroke-dashoffset: -360; }
-}
-
-@keyframes laser-flow-backward {
-  to { stroke-dashoffset: 360; }
-}
-
-/* Dynamic floating tags style */
+/* Animated tags */
 .svg-float-text {
   font-family: var(--font-sans);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.12));
+}
+
+.svg-float-text text {
+  fill: #1e293b;
+  font-size: 7.5px;
+  font-weight: 800;
   letter-spacing: 0.5px;
 }
 
+[data-theme='dark'] .svg-float-text text {
+  fill: #e2e8f0;
+}
+
 .svg-text-bg {
-  fill: rgba(14, 14, 28, 0.9);
-  stroke: rgba(129, 140, 248, 0.3);
-  stroke-width: 1px;
-  rx: 8px;
-  ry: 8px;
+  fill: #ffffff;
+  stroke: rgba(200, 205, 230, 0.9);
+  stroke-width: 0.8;
+  rx: 10;
+  ry: 10;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+}
+
+[data-theme='dark'] .svg-text-bg {
+  fill: #1e1e32;
+  stroke: rgba(99, 102, 241, 0.35);
 }
 
 .svg-text-bg-emerald {
-  stroke: rgba(16, 185, 129, 0.3);
+  stroke: rgba(16, 185, 129, 0.5);
 }
 
-.svg-text-bg-amber {
-  stroke: rgba(245, 158, 11, 0.3);
+/* Moving dot on path */
+.path-dot {
+  r: 5;
+}
+
+/* Laser paths */
+.laser-path {
+  stroke-linecap: round;
+}
+
+.laser-path-dash {
+  stroke-dasharray: 8 14;
+  animation: laser-flow-forward 18s linear infinite;
+}
+
+@keyframes laser-flow-forward {
+  to {
+    stroke-dashoffset: -500;
+  }
 }
 
 /* =====================================================
@@ -541,7 +627,64 @@
     display: none;
   }
   .auth-right {
-    min-height: 100vh;
-    padding: var(--space-8) var(--space-6);
+    height: 100vh;
+    padding: var(--space-6) var(--space-4);
   }
+  .auth-form-box {
+    padding: var(--space-6) var(--space-5);
+    border-radius: var(--radius-lg);
+  }
+}
+
+/* ── Floating Theme Toggle Wrapper ── */
+.auth-theme-toggle-wrapper {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 100;
+}
+
+/* ── Auth Page Spacing Overrides to prevent scrolling ── */
+.auth-page .form-input,
+.auth-page .form-select {
+  /* Keep vertical padding compact but DON'T override horizontal padding
+     so that .input-group .form-input can still apply padding-left for icons */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-right: 14px;
+  /* padding-left intentionally omitted — controlled by .input-group .form-input */
+}
+
+/* Inputs WITHOUT an icon wrapper get standard left padding */
+.auth-page .form-group > .form-input,
+.auth-page .form-group > .form-select {
+  padding-left: 14px;
+}
+
+/* Inputs WITH icon wrapper: preserve the larger left padding for the icon */
+.auth-page .input-group .form-input {
+  padding-left: var(--space-10); /* ~40px — clears the icon */
+}
+
+/* Password inputs with eye toggle: add right padding so text doesn't go under the button */
+.auth-page .input-group .form-input[type='password'],
+.auth-page .input-group .form-input[type='text'] {
+  padding-right: 44px;
+}
+
+.auth-page .form-group {
+  margin-bottom: 12px;
+}
+.auth-page .role-card {
+  padding: 8px 12px;
+}
+.auth-page .role-card .role-icon {
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+.auth-page .auth-brand {
+  margin-bottom: 24px;
+}
+.auth-page .auth-tagline {
+  margin-top: 16px;
 }

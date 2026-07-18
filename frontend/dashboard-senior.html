@@ -141,8 +141,8 @@
       document.addEventListener('DOMContentLoaded', async () => {
         const user = requireAuth(['senior']);
         if (!user) return;
-        renderNavbar();
-        renderSidebar('senior');
+        window.location.href = 'dashboard.html';
+        return;
         document.getElementById('user-name').textContent = user.name?.split(' ')[0] || 'Mentor';
 
         // Availability toggle

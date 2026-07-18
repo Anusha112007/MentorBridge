@@ -78,8 +78,13 @@ router.get('/:id', protect, async (req, res) => {
 // @route POST /api/questions/:id/answers — Post an answer
 router.post('/:id/answers', protect, async (req, res) => {
   try {
-    const question = await Question.findById(req.params.id);
+    const question = await Question.findById(req.params.id).populate('author');
     if (!question) return res.status(404).json({ error: 'Question not found' });
+
+    // Rule: A user cannot answer their own question
+    if (question.author._id.toString() === req.user._id.toString()) {
+      return res.status(400).json({ error: 'You cannot answer your own question' });
+    }
 
     const answer = await Answer.create({
       question: question._id,

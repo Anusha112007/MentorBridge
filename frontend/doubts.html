@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/global.css" />
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/layout.css" />
-    <link rel="stylesheet" href="css/pages/directory.css" />
+    <link rel="stylesheet" href="css/pages/doubts.css" />
   </head>
   <body>
     <nav class="navbar" id="navbar"></nav>
@@ -179,11 +179,40 @@
         });
       });
 
+      function renderAuthorInitials(name) {
+        if (!name) return '<span class="avatar-initials-badge" style="background:#6b7280">A</span>';
+        const parts = name.split(' ');
+        const initials = parts
+          .map((p) => p[0])
+          .join('')
+          .slice(0, 2)
+          .toUpperCase();
+
+        const gradients = [
+          'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', // Indigo
+          'linear-gradient(135deg, #10b981 0%, #059669 100%)', // Emerald
+          'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', // Cyan
+          'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', // Amber
+          'linear-gradient(135deg, #ec4899 0%, #db2777 100%)', // Pink
+          'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', // Purple
+          'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', // Blue
+        ];
+
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+          hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const index = Math.abs(hash) % gradients.length;
+        const grad = gradients[index];
+
+        return `<span class="avatar-initials-badge" style="background:${grad}">${initials}</span>`;
+      }
+
       async function loadDoubts() {
         const search = document.getElementById('search-input')?.value || '';
         const el = document.getElementById('doubts-list');
         el.innerHTML =
-          '<div style="color:var(--text-muted);font-size:13px;padding:16px">Loading...</div>';
+          '<div style="color:var(--text-muted);font-size:13px;padding:16px;text-align:center">Loading doubts...</div>';
         try {
           const params = new URLSearchParams({
             page: currentPage,
@@ -201,18 +230,25 @@
           el.innerHTML = questions
             .map(
               (q) => `
-      <div class="card" style="margin-bottom:10px;cursor:pointer;transition:border-color .2s" onclick="showDetail('${q._id}')" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor=''">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-          <div style="flex:1">
-            <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:4px">${q.title}</div>
-            ${q.body ? `<div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${q.body}</div>` : ''}
-            <div style="display:flex;align-items:center;gap:12px;font-size:11px;color:var(--text-muted)">
-              <span>👤 ${q.author?.name || 'Anonymous'}</span>
-              <span>💬 ${q.answers?.length || 0} answers</span>
-              <span>${timeAgo(q.createdAt)}</span>
+      <div class="doubt-premium-card animate-fade-in" onclick="showDetail('${q._id}')">
+        <div class="doubt-card-header">
+          <div class="doubt-card-title">${q.title}</div>
+          <span class="tag-category-premium cat-${q.category || 'general'}">${q.category || 'general'}</span>
+        </div>
+        ${q.body ? `<div class="doubt-card-body">${q.body}</div>` : ''}
+        <div class="doubt-card-footer">
+          <div class="doubt-meta-info">
+            <div class="doubt-meta-item">
+              ${renderAuthorInitials(q.author?.name)}
+              <span style="font-weight:700;color:var(--text-primary)">${q.author?.name || 'Anonymous'}</span>
+            </div>
+            <div class="doubt-meta-item">
+              <span>📅 ${timeAgo(q.createdAt)}</span>
             </div>
           </div>
-          <span class="badge badge-primary" style="flex-shrink:0">${q.category}</span>
+          <div class="answers-count-capsule ${q.answers?.length ? 'answered' : ''}">
+            💬 ${q.answers?.length || 0} answer${q.answers?.length !== 1 ? 's' : ''}
+          </div>
         </div>
       </div>`
             )
@@ -253,14 +289,23 @@
           const q = data.question;
 
           document.getElementById('question-detail').innerHTML = `
-      <div class="card">
-        <span class="badge badge-primary" style="margin-bottom:10px">${q.category}</span>
-        <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:10px">${q.title}</h2>
-        ${q.body ? `<p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:16px">${q.body}</p>` : ''}
-        <div style="font-size:12px;color:var(--text-muted);display:flex;gap:16px;padding-top:12px;border-top:1px solid var(--border-subtle)">
-          <span>👤 ${q.author?.name || 'Anonymous'}</span>
-          <span>👁️ ${q.views} views</span>
-          <span>${timeAgo(q.createdAt)}</span>
+      <div class="doubt-premium-card" style="cursor:default;transform:none;border-color:rgba(129, 140, 248, 0.25)">
+        <div class="doubt-card-header" style="margin-bottom:12px">
+          <span class="tag-category-premium cat-${q.category || 'general'}">${q.category || 'general'}</span>
+          <span class="doubt-meta-item" style="font-size:11px;color:var(--text-muted)">👁️ ${q.views || 0} views</span>
+        </div>
+        <h2 style="font-size:1.4rem;font-weight:800;color:var(--text-primary);margin-bottom:12px;line-height:1.45">${q.title}</h2>
+        ${q.body ? `<p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:20px;white-space:pre-wrap">${q.body}</p>` : ''}
+        <div class="doubt-card-footer">
+          <div class="doubt-meta-info">
+            <div class="doubt-meta-item">
+              ${renderAuthorInitials(q.author?.name)}
+              <span style="font-weight:700;color:var(--text-primary)">${q.author?.name || 'Anonymous'}</span>
+            </div>
+            <div class="doubt-meta-item">
+              <span>📅 Asked ${timeAgo(q.createdAt)}</span>
+            </div>
+          </div>
         </div>
       </div>`;
 
@@ -268,22 +313,30 @@
           const aSection = document.getElementById('answers-section');
           aSection.innerHTML = `<h3 style="font-size:14px;font-weight:700;margin-bottom:12px">${answers.length} Answer${answers.length !== 1 ? 's' : ''}</h3>`;
           if (!answers.length) {
-            aSection.innerHTML += `<div class="card" style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px">No answers yet. Be the first!</div>`;
+            aSection.innerHTML += `<div class="doubt-premium-card" style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;cursor:default;transform:none;">No answers yet. Be the first!</div>`;
           } else {
-            aSection.innerHTML += answers
+            const renderedAnswers = answers
               .map(
                 (a) => `
-        <div class="card" style="margin-bottom:10px;${a.isAccepted ? 'border-color:var(--success)' : ''}">
-          ${a.isAccepted ? '<div style="font-size:12px;font-weight:700;color:var(--success);margin-bottom:8px">✅ Accepted Answer</div>' : ''}
-          <p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:12px">${a.body}</p>
-          <div style="font-size:12px;color:var(--text-muted);display:flex;gap:12px">
-            <span>👤 ${a.author?.name || '—'}</span>
-            <span>${timeAgo(a.createdAt)}</span>
-            ${q.author?._id === user?._id && !q.acceptedAnswer ? `<button onclick="acceptAnswer('${a._id}','${id}')" style="background:none;border:none;color:var(--primary-light);cursor:pointer;font-size:12px;padding:0;margin-left:auto">✓ Accept</button>` : ''}
+        <div class="doubt-premium-card animate-scale-in" style="cursor:default;transform:none;margin-bottom:16px;${a.isAccepted ? 'border-color:var(--secondary);box-shadow: 0 0 15px rgba(16,185,129,0.1)' : ''}">
+          ${a.isAccepted ? '<div style="font-size:12px;font-weight:800;color:var(--secondary);margin-bottom:8px;display:flex;align-items:center;gap:4px">✅ ACCEPTED SOLUTION</div>' : ''}
+          <p style="font-size:14px;color:var(--text-secondary);line-height:1.8;margin-bottom:16px;white-space:pre-wrap">${a.body}</p>
+          <div class="doubt-card-footer" style="padding-top:10px">
+            <div class="doubt-meta-info">
+              <div class="doubt-meta-item">
+                ${renderAuthorInitials(a.author?.name)}
+                <span style="font-weight:700;color:var(--text-primary)">${a.author?.name || 'Mentor'}</span>
+              </div>
+              <div class="doubt-meta-item">
+                <span>📅 Answered ${timeAgo(a.createdAt)}</span>
+              </div>
+            </div>
+            ${q.author?._id === user?._id && !q.acceptedAnswer ? `<button onclick="acceptAnswer('${a._id}','${id}')" style="background:none;border:none;color:var(--primary-light);cursor:pointer;font-size:12px;font-weight:700;padding:0;margin-left:auto">✓ Accept Solution</button>` : ''}
           </div>
         </div>`
               )
               .join('');
+            aSection.innerHTML += `<div class="answers-timeline-container">${renderedAnswers}</div>`;
           }
 
           document.getElementById('submit-answer').onclick = async () => {

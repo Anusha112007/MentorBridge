@@ -346,7 +346,9 @@ window.addEventListener('scroll', () => {
       osc.start();
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
       setTimeout(() => osc.stop(), 350);
-    } catch (_e) { /* AudioContext may be blocked by browser autoplay policy — ignore */ }
+    } catch (_e) {
+      /* AudioContext may be blocked by browser autoplay policy — ignore */
+    }
 
     // Auto-dismiss after 6 seconds
     setTimeout(() => {
@@ -362,7 +364,7 @@ window.addEventListener('scroll', () => {
   function updateMessageBadge(count) {
     // Remove existing badges first
     document.querySelectorAll('.msg-badge').forEach((b) => b.remove());
-    
+
     if (count <= 0) {
       document.title = originalTitle;
       return;

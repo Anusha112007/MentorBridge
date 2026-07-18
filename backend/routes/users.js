@@ -10,18 +10,34 @@ router.get('/seniors', protect, async (req, res) => {
     const { branch, skills, domain, company, batch, search, page = 1, limit = 12 } = req.query;
     const query = { role: 'senior', isActive: true };
 
-    if (branch) query.branch = { $regex: branch, $options: 'i' };
-    if (company) query.placementCompany = { $regex: company, $options: 'i' };
-    if (batch) query.graduationYear = Number(batch);
-    if (skills) query.skills = { $in: skills.split(',').map((s) => new RegExp(s.trim(), 'i')) };
-    if (domain) query.areasOfExpertise = { $in: [new RegExp(domain, 'i')] };
+    const andQueries = [];
+    if (branch) andQueries.push({ branch: { $regex: branch, $options: 'i' } });
+    if (company) andQueries.push({ placementCompany: { $regex: company, $options: 'i' } });
+    if (batch) andQueries.push({ graduationYear: Number(batch) });
+    if (skills) {
+      andQueries.push({ skills: { $in: skills.split(',').map((s) => new RegExp(s.trim(), 'i')) } });
+    }
+    if (domain) {
+      andQueries.push({
+        $or: [
+          { areasOfExpertise: { $in: [new RegExp(domain, 'i')] } },
+          { skills: { $in: [new RegExp(domain, 'i')] } },
+        ],
+      });
+    }
     if (search) {
-      query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { skills: { $in: [new RegExp(search, 'i')] } },
-        { areasOfExpertise: { $in: [new RegExp(search, 'i')] } },
-        { placementCompany: { $regex: search, $options: 'i' } },
-      ];
+      andQueries.push({
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { skills: { $in: [new RegExp(search, 'i')] } },
+          { areasOfExpertise: { $in: [new RegExp(search, 'i')] } },
+          { placementCompany: { $regex: search, $options: 'i' } },
+        ],
+      });
+    }
+
+    if (andQueries.length > 0) {
+      query.$and = andQueries;
     }
 
     const total = await User.countDocuments(query);
@@ -83,7 +99,6 @@ router.put('/me', protect, upload.single('profilePicture'), async (req, res) => 
     delete updates.password;
     delete updates.role;
     delete updates.email;
-    updates.branch = 'CSE';
 
     const user = await User.findByIdAndUpdate(req.user._id, updates, {
       new: true,

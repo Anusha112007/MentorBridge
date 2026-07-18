@@ -23,6 +23,32 @@ const userSchema = new mongoose.Schema(
     placementCompany: { type: String, default: '' },
     currentDesignation: { type: String, default: '' },
     availabilityStatus: { type: Boolean, default: true },
+    leetcode: { type: String, default: '' },
+    rating: { type: Number, default: 5.0 },
+    menteeCount: { type: Number, default: 0 },
+    areasOfMentorship: [{ type: String }],
+    projects: [
+      {
+        title: { type: String },
+        description: { type: String },
+        link: { type: String },
+      },
+    ],
+    certifications: [
+      {
+        name: { type: String },
+        issuer: { type: String },
+        date: { type: Date },
+      },
+    ],
+    reviews: [
+      {
+        reviewerName: { type: String },
+        comment: { type: String },
+        rating: { type: Number },
+        date: { type: Date, default: Date.now },
+      },
+    ],
 
     // Junior-specific
     currentYear: { type: Number },

@@ -120,8 +120,8 @@
       document.addEventListener('DOMContentLoaded', async () => {
         const user = requireAuth(['junior']);
         if (!user) return;
-        renderNavbar();
-        renderSidebar('junior');
+        window.location.href = 'dashboard.html';
+        return;
         document.getElementById('user-name').textContent = user.name?.split(' ')[0] || 'Student';
 
         // Mentorship requests

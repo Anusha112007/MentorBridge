@@ -61,9 +61,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div style="font-weight:600;font-size:14px">${name}</div>
           <div style="font-size:11px;color:var(--text-muted);text-transform:capitalize">${role}</div>
         </div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <a href="profile.html?id=${userId}" class="btn btn-secondary btn-sm">Profile</a>
       </div>`;
 
     await loadMessages();

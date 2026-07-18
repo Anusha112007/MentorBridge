@@ -8,12 +8,297 @@
       name="description"
       content="Sign in or create your MentorBridge account to start your mentorship journey."
     />
+    <script>
+      (function () {
+        const saved = localStorage.getItem('mb_theme');
+        if (saved) {
+          document.documentElement.setAttribute('data-theme', saved);
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="css/global.css" />
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/layout.css" />
     <link rel="stylesheet" href="css/pages/auth.css" />
+    <style>
+      /* ── Role-first Registration Page ── */
+      .role-hero {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-bottom: 24px;
+      }
+
+      .role-hero-card {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 18px 22px;
+        border-radius: 16px;
+        border: 2px solid var(--border-subtle);
+        background: var(--bg-elevated);
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .role-hero-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity 0.25s;
+        pointer-events: none;
+      }
+
+      .role-hero-card.junior::before {
+        background: linear-gradient(
+          135deg,
+          rgba(79, 70, 229, 0.06) 0%,
+          rgba(6, 182, 212, 0.06) 100%
+        );
+      }
+
+      .role-hero-card.senior::before {
+        background: linear-gradient(
+          135deg,
+          rgba(16, 185, 129, 0.06) 0%,
+          rgba(52, 211, 153, 0.06) 100%
+        );
+      }
+
+      .role-hero-card:hover {
+        transform: translateY(-2px);
+        border-color: var(--border-hover);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      }
+
+      .role-hero-card:hover::before {
+        opacity: 1;
+      }
+
+      .role-hero-card.selected {
+        transform: scale(1.02);
+        box-shadow: 0 8px 32px rgba(108, 99, 255, 0.18);
+      }
+
+      .role-hero-card.selected.junior {
+        border-color: #4f46e5;
+        background: rgba(79, 70, 229, 0.08);
+      }
+
+      .role-hero-card.selected.senior {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.08);
+      }
+
+      .role-hero-card .check-ring {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid var(--border-subtle);
+        margin-left: auto;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        transition: all 0.2s;
+        color: transparent;
+      }
+
+      .role-hero-card.selected.junior .check-ring {
+        border-color: #4f46e5;
+        background: #4f46e5;
+        color: white;
+      }
+
+      .role-hero-card.selected.senior .check-ring {
+        border-color: #10b981;
+        background: #10b981;
+        color: white;
+      }
+
+      .role-hero-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+        flex-shrink: 0;
+      }
+
+      .role-hero-avatar.junior-av {
+        background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
+      }
+
+      .role-hero-avatar.senior-av {
+        background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+      }
+
+      .role-hero-text h4 {
+        font-size: 15px;
+        font-weight: 800;
+        margin: 0 0 2px;
+        color: var(--text-primary);
+      }
+
+      .role-hero-text p {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      /* Step transitions */
+      .auth-step {
+        display: none;
+      }
+      .auth-step.active {
+        display: block;
+        animation: stepFadeIn 0.3s ease;
+      }
+
+      @keyframes stepFadeIn {
+        from {
+          opacity: 0;
+          transform: translateX(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .step-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+      }
+
+      .back-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 18px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        transition: color 0.2s;
+      }
+      .back-btn:hover {
+        color: var(--text-primary);
+      }
+
+      .selected-role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin-bottom: 20px;
+      }
+
+      .selected-role-badge.junior {
+        background: rgba(79, 70, 229, 0.12);
+        color: #6366f1;
+        border: 1px solid rgba(79, 70, 229, 0.25);
+      }
+
+      .selected-role-badge.senior {
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+      }
+
+      /* Tab styling tweak */
+      .auth-tabs-row {
+        display: flex;
+        background: var(--bg-elevated);
+        border-radius: 14px;
+        padding: 4px;
+        margin-bottom: 22px;
+        gap: 4px;
+      }
+
+      .auth-tab-btn {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 10px;
+        transition: all 0.2s;
+        color: var(--text-muted);
+        border: none;
+        background: none;
+      }
+
+      .auth-tab-btn.active {
+        background: var(--gradient-primary);
+        color: #fff;
+        box-shadow: 0 2px 12px rgba(108, 99, 255, 0.3);
+      }
+
+      /* Animated dash path */
+      .anim-dash {
+        stroke-dashoffset: 0;
+        animation: dashFlow 3s linear infinite;
+      }
+      @keyframes dashFlow {
+        to {
+          stroke-dashoffset: -56;
+        }
+      }
+
+      .form-select {
+        width: 100%;
+        padding: 10px 14px;
+        background: var(--bg-elevated);
+        border: 1.5px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: var(--text-sm);
+        font-family: var(--font-sans);
+        transition: border-color var(--transition);
+        outline: none;
+        cursor: pointer;
+        appearance: auto;
+      }
+      .form-select:focus {
+        border-color: var(--primary);
+      }
+    </style>
   </head>
   <body>
+    <!-- Floating Theme Toggle -->
+    <div class="auth-theme-toggle-wrapper">
+      <button
+        class="theme-toggle"
+        id="theme-toggle"
+        onclick="toggleTheme()"
+        title="Toggle light/dark mode"
+        aria-label="Toggle theme"
+      >
+        <div class="theme-toggle-track">
+          <span class="theme-toggle-icon sun">☀️</span>
+          <span class="theme-toggle-icon moon">🌙</span>
+        </div>
+        <div class="theme-toggle-knob"></div>
+      </button>
+    </div>
+
     <div class="auth-page">
       <!-- Left panel -->
       <div class="auth-left">
@@ -23,27 +308,23 @@
             <span>MentorBridge</span>
           </a>
           <div class="auth-tagline animate-fade-in">
-            <h1>Your <span class="gradient-text">career journey</span> starts here.</h1>
-            <p>
-              Connect with seniors, get real mentorship, discover placement strategies and resources
-              that actually help you succeed.
-            </p>
+            <h1>
+              Learn from <span class="gradient-text">seniors</span>.<br />Grow with confidence.
+            </h1>
           </div>
+
           <!-- Mentor Connection Bridge Graphic -->
           <div class="mentor-bridge-card animate-fade-in delay-400">
-            <!-- Background futuristic grid -->
             <div class="card-grid-bg"></div>
-            
             <div class="bridge-title">🎓 Mentor Connection Bridge</div>
             <div class="bridge-container">
-              <!-- Junior node (representing junior student) -->
+              <!-- Junior node -->
               <div class="bridge-node junior-node">
-                <!-- Portal Rotating Rings -->
                 <div class="portal-ring-outer"></div>
                 <div class="portal-ring-inner"></div>
                 <div class="node-avatar-wrapper">
-                  <img src="images/junior_avatar.png" alt="Junior Student" class="node-avatar">
-                  <span class="node-emoji">👨‍🎓</span>
+                  <img src="images/junior_avatar.png" alt="Junior Student" class="node-avatar" />
+                  <span class="node-emoji">💻</span>
                 </div>
                 <div class="node-info">
                   <span class="node-label">Junior Student</span>
@@ -51,93 +332,142 @@
                 </div>
               </div>
 
-              <!-- Bridging Lines -->
+              <!-- SVG Bridge Lines -->
               <div class="bridge-lines">
-                <svg width="100%" height="100%" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                  <!-- Curve 1: Primary glowing line (Cyan/Indigo Gradient) -->
-                  <path class="laser-path-glow" d="M 25 75 C 75 75, 125 25, 175 25" stroke="url(#laser-grad-1)" stroke-width="5" />
-                  <path class="laser-path laser-path-dash" d="M 25 75 C 75 75, 125 25, 175 25" stroke="url(#laser-grad-1)" stroke-width="2.5" />
-                  
-                  <!-- Curve 2: Secondary offset line representing back-and-forth guidance (Green/Amber Gradient) -->
-                  <path class="laser-path-glow" d="M 25 75 C 65 95, 135 5, 175 25" stroke="url(#laser-grad-2)" stroke-width="4" opacity="0.5" />
-                  <path class="laser-path laser-path-dash-reverse" d="M 25 75 C 65 95, 135 5, 175 25" stroke="url(#laser-grad-2)" stroke-width="1.5" />
-                  
-                  <!-- Dynamic Floating Transaction Emojis/Symbols (moving along the main curve) -->
-                  
-                  <!-- Particle 1: Purple Glowing Pulse -->
-                  <circle r="5" fill="#818cf8">
-                    <animateMotion dur="4.5s" repeatCount="indefinite" path="M 25 75 C 75 75, 125 25, 175 25" />
-                    <animate attributeName="r" values="3;6;3" dur="2s" repeatCount="indefinite" />
-                  </circle>
-                  
-                  <!-- Particle 2: Emerald Guidance Spark -->
-                  <circle r="4.5" fill="#34d399">
-                    <animateMotion dur="3.5s" repeatCount="indefinite" path="M 25 75 C 65 95, 135 5, 175 25" begin="1s" />
-                    <animate attributeName="opacity" values="0.2;1;0.2" dur="3.5s" repeatCount="indefinite" />
-                  </circle>
-
-                  <!-- Particle 3: Amber Question Spark -->
-                  <circle r="4" fill="#fbbf24">
-                    <animateMotion dur="5.5s" repeatCount="indefinite" path="M 25 75 C 75 75, 125 25, 175 25" begin="2s" />
-                  </circle>
-
-                  <!-- Dynamic Floating Text Tags -->
-                  <!-- Doubt Tag -->
-                  <g class="svg-float-text">
-                    <rect x="-42" y="-12" width="84" height="20" class="svg-text-bg" />
-                    <text x="0" y="2" font-size="8" fill="#e0e7ff" font-weight="700" text-anchor="middle">
-                      Doubt Asked ❓
-                    </text>
-                    <animateMotion dur="8s" repeatCount="indefinite" path="M 25 75 C 75 75, 125 25, 175 25" begin="0.5s" />
-                    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.05;0.2;0.7;0.85;1" dur="8s" repeatCount="indefinite" begin="0.5s" />
-                  </g>
-
-                  <!-- Mentorship/Guidance Tag -->
-                  <g class="svg-float-text">
-                    <rect x="-48" y="-12" width="96" height="20" class="svg-text-bg svg-text-bg-emerald" />
-                    <text x="0" y="2" font-size="8" fill="#ecfdf5" font-weight="700" text-anchor="middle">
-                      Guidance Shared 🧑‍🏫
-                    </text>
-                    <animateMotion dur="8s" repeatCount="indefinite" path="M 175 25 C 135 5, 65 95, 25 75" begin="3s" />
-                    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.05;0.2;0.7;0.85;1" dur="8s" repeatCount="indefinite" begin="3s" />
-                  </g>
-
-                  <!-- Success/Placement Tag -->
-                  <g class="svg-float-text">
-                    <rect x="-45" y="-12" width="90" height="20" class="svg-text-bg svg-text-bg-amber" />
-                    <text x="0" y="2" font-size="8" fill="#fffbeb" font-weight="700" text-anchor="middle">
-                      Placed at Google 🚀
-                    </text>
-                    <animateMotion dur="8s" repeatCount="indefinite" path="M 25 75 C 75 75, 125 25, 175 25" begin="5.5s" />
-                    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.05;0.2;0.7;0.85;1" dur="8s" repeatCount="indefinite" begin="5.5s" />
-                  </g>
-
-                  <!-- Definitions -->
+                <svg
+                  width="100%"
+                  height="100%"
+                  viewBox="0 0 200 100"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  preserveAspectRatio="none"
+                  style="overflow: visible"
+                >
                   <defs>
-                    <!-- Laser Gradient 1 (Indigo to Cyan) -->
-                    <linearGradient id="laser-grad-1" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <linearGradient id="pg" x1="0%" y1="100%" x2="100%" y2="0%">
                       <stop offset="0%" stop-color="#4f46e5" />
                       <stop offset="50%" stop-color="#818cf8" />
-                      <stop offset="100%" stop-color="#06b6d4" />
-                    </linearGradient>
-                    <!-- Laser Gradient 2 (Emerald to Amber) -->
-                    <linearGradient id="laser-grad-2" x1="0%" y1="100%" x2="100%" y2="0%">
-                      <stop offset="0%" stop-color="#10b981" />
-                      <stop offset="60%" stop-color="#34d399" />
-                      <stop offset="100%" stop-color="#fbbf24" />
+                      <stop offset="100%" stop-color="#10b981" />
                     </linearGradient>
                   </defs>
+
+                  <!-- Soft glow path behind -->
+                  <path
+                    d="M 20 80 C 70 80, 130 20, 180 20"
+                    stroke="url(#pg)"
+                    stroke-width="6"
+                    stroke-linecap="round"
+                    opacity="0.12"
+                  />
+
+                  <!-- Main dashed path -->
+                  <path
+                    d="M 20 80 C 70 80, 130 20, 180 20"
+                    stroke="url(#pg)"
+                    stroke-width="1.8"
+                    stroke-dasharray="5 9"
+                    stroke-linecap="round"
+                    opacity="0.75"
+                    class="anim-dash"
+                  />
+
+                  <!-- Glowing travelling dot -->
+                  <circle r="4.5" fill="#10b981" filter="url(#glow)">
+                    <animateMotion
+                      dur="3.5s"
+                      repeatCount="indefinite"
+                      path="M 20 80 C 70 80, 130 20, 180 20"
+                      keyPoints="0;1"
+                      keyTimes="0;1"
+                      calcMode="linear"
+                    />
+                    <animate
+                      attributeName="r"
+                      values="4.5;5.5;4.5"
+                      dur="1.5s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0.9;1;0.9"
+                      dur="1.5s"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+
+                  <!-- DOUBT ASKED tag — animates from junior → senior -->
+                  <g class="svg-float-text" opacity="0">
+                    <rect
+                      x="-46"
+                      y="-11"
+                      width="92"
+                      height="22"
+                      rx="11"
+                      ry="11"
+                      class="svg-text-bg"
+                    />
+                    <text x="0" y="3" text-anchor="middle">DOUBT ASKED</text>
+                    <animateMotion
+                      dur="9s"
+                      repeatCount="indefinite"
+                      path="M 20 80 C 70 80, 130 20, 180 20"
+                      begin="0s"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0;0;1;1;1;0;0"
+                      keyTimes="0;0.05;0.2;0.4;0.7;0.85;1"
+                      dur="9s"
+                      repeatCount="indefinite"
+                      begin="0s"
+                    />
+                  </g>
+
+                  <!-- GUIDANCE SHARED tag — animates from senior → junior -->
+                  <g class="svg-float-text" opacity="0">
+                    <rect
+                      x="-52"
+                      y="-11"
+                      width="104"
+                      height="22"
+                      rx="11"
+                      ry="11"
+                      class="svg-text-bg svg-text-bg-emerald"
+                    />
+                    <text x="0" y="3" text-anchor="middle">GUIDANCE SHARED</text>
+                    <animateMotion
+                      dur="9s"
+                      repeatCount="indefinite"
+                      path="M 180 20 C 130 20, 70 80, 20 80"
+                      begin="4.5s"
+                    />
+                    <animate
+                      attributeName="opacity"
+                      values="0;0;1;1;1;0;0"
+                      keyTimes="0;0.05;0.2;0.4;0.7;0.85;1"
+                      dur="9s"
+                      repeatCount="indefinite"
+                      begin="4.5s"
+                    />
+                  </g>
+
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="2.5" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
                 </svg>
               </div>
 
-              <!-- Senior node (representing senior student) -->
+              <!-- Senior node -->
               <div class="bridge-node senior-node">
-                <!-- Portal Rotating Rings -->
                 <div class="portal-ring-outer"></div>
                 <div class="portal-ring-inner"></div>
                 <div class="node-avatar-wrapper">
-                  <img src="images/senior_avatar.png" alt="Senior Mentor" class="node-avatar">
-                  <span class="node-emoji">🏆</span>
+                  <img src="images/senior_avatar.png" alt="Senior Mentor" class="node-avatar" />
+                  <span class="node-emoji">🎓</span>
                 </div>
                 <div class="node-info">
                   <span class="node-label">Senior Mentor</span>
@@ -152,14 +482,14 @@
       <!-- Right panel: Auth form -->
       <div class="auth-right">
         <div class="auth-form-box animate-scale-in">
-          <!-- Tabs -->
-          <div class="auth-tabs">
-            <button class="auth-tab active" id="login-tab">Sign In</button>
-            <button class="auth-tab" id="register-tab">Create Account</button>
+          <!-- Tabs: Sign In / Create Account -->
+          <div class="auth-tabs-row">
+            <button class="auth-tab-btn" id="login-tab">Sign In</button>
+            <button class="auth-tab-btn active" id="register-tab">Create Account</button>
           </div>
 
-          <!-- LOGIN FORM -->
-          <div id="login-form" class="tab-content active">
+          <!-- ===== LOGIN PANEL ===== -->
+          <div id="login-panel" class="tab-content" style="display: none">
             <h2 class="auth-form-title">Welcome back 👋</h2>
             <p class="auth-form-subtitle">Sign in to your MentorBridge account</p>
             <div class="auth-form">
@@ -187,22 +517,7 @@
                     placeholder="Enter your password"
                     autocomplete="current-password"
                   />
-                  <button
-                    class="pw-toggle"
-                    type="button"
-                    style="
-                      position: absolute;
-                      right: 14px;
-                      top: 50%;
-                      transform: translateY(-50%);
-                      background: none;
-                      border: none;
-                      cursor: pointer;
-                      color: var(--text-muted);
-                    "
-                  >
-                    👁️
-                  </button>
+                  <button class="pw-toggle" type="button">👁️</button>
                 </div>
               </div>
               <div style="text-align: right; margin-top: -12px">
@@ -217,112 +532,125 @@
             </div>
           </div>
 
-          <!-- REGISTER FORM -->
-          <div id="register-form" class="tab-content">
-            <h2 class="auth-form-title">Join MentorBridge 🚀</h2>
-            <p class="auth-form-subtitle">Create your free account to get started</p>
+          <!-- ===== REGISTER PANEL ===== -->
+          <div id="register-panel" class="tab-content" style="display: block">
+            <!-- STEP 1: Role Selection -->
+            <div id="step-role" class="auth-step active">
+              <h2 class="auth-form-title">Join MentorBridge 🚀</h2>
+              <p class="auth-form-subtitle" style="margin-bottom: 24px">Who are you joining as?</p>
 
-            <div style="margin-bottom: 20px">
-              <label class="form-label" style="margin-bottom: 10px; display: block"
-                >I am a...</label
-              >
-              <div class="role-selector">
-                <div class="role-card selected" data-role="junior">
-                  <div class="role-icon">👨‍🎓</div>
-                  <div class="role-name">Junior</div>
-                  <div class="role-desc">Looking for guidance</div>
+              <div class="role-hero">
+                <!-- Junior Card -->
+                <div class="role-hero-card junior" id="role-junior" data-role="junior">
+                  <div class="role-hero-avatar junior-av">👨‍🎓</div>
+                  <div class="role-hero-text">
+                    <h4>Junior Student</h4>
+                    <p>1st or 2nd year — looking to learn from seniors and get guidance</p>
+                  </div>
+                  <div class="check-ring">✓</div>
                 </div>
-                <div class="role-card" data-role="senior">
-                  <div class="role-icon">🏆</div>
-                  <div class="role-name">Senior</div>
-                  <div class="role-desc">Ready to mentor</div>
-                </div>
-              </div>
-            </div>
 
-            <div class="auth-form">
-              <div class="form-group">
-                <label class="form-label">Full Name *</label>
-                <div class="input-group">
-                  <span class="input-icon">👤</span>
-                  <input
-                    class="form-input"
-                    type="text"
-                    id="reg-name"
-                    placeholder="Your full name"
-                  />
+                <!-- Senior Card -->
+                <div class="role-hero-card senior" id="role-senior" data-role="senior">
+                  <div class="role-hero-avatar senior-av">🏆</div>
+                  <div class="role-hero-text">
+                    <h4>Senior Student / Alumni</h4>
+                    <p>3rd, 4th year or graduated — ready to mentor and share experience</p>
+                  </div>
+                  <div class="check-ring">✓</div>
                 </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Email Address *</label>
-                <div class="input-group">
-                  <span class="input-icon">📧</span>
-                  <input
-                    class="form-input"
-                    type="email"
-                    id="reg-email"
-                    placeholder="you@college.edu"
-                  />
-                </div>
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
-                <div class="form-group">
-                  <label class="form-label">Branch *</label>
-                  <input
-                    class="form-input"
-                    type="text"
-                    id="reg-branch"
-                    value="CSE"
-                    readonly
-                    style="background: rgba(255, 255, 255, 0.05); cursor: not-allowed"
-                  />
-                </div>
-                <div class="form-group">
-                  <label class="form-label" id="year-label">Current Year</label>
-                  <select class="form-select" id="reg-year">
-                    <option value="1">1st Year</option>
-                    <option value="2">2nd Year</option>
-                    <option value="3">3rd Year</option>
-                    <option value="4">4th Year</option>
-                  </select>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Password *</label>
-                <div class="input-group" style="position: relative">
-                  <span class="input-icon">🔒</span>
-                  <input
-                    class="form-input"
-                    type="password"
-                    id="reg-password"
-                    placeholder="Min. 6 characters"
-                  />
-                  <button
-                    class="pw-toggle"
-                    type="button"
-                    style="
-                      position: absolute;
-                      right: 14px;
-                      top: 50%;
-                      transform: translateY(-50%);
-                      background: none;
-                      border: none;
-                      cursor: pointer;
-                      color: var(--text-muted);
-                    "
-                  >
-                    👁️
-                  </button>
-                </div>
-              </div>
-              <button class="btn btn-primary btn-lg btn-full" id="register-submit">
-                Create Account 🎉
+
+              <button class="btn btn-primary btn-lg btn-full" id="role-next-btn" disabled>
+                Continue →
               </button>
+
+              <div class="auth-link" style="margin-top: 20px">
+                Already have an account? <a href="#" id="goto-login">Sign in</a>
+              </div>
             </div>
-            <div class="auth-link" style="margin-top: 24px; font-size: 12px">
-              By signing up, you agree to our Terms & Privacy Policy.
+
+            <!-- STEP 2: Fill Details -->
+            <div id="step-details" class="auth-step">
+              <div class="step-header">
+                <button class="back-btn" id="back-to-role">←</button>
+                <h2 class="auth-form-title" style="margin: 0">Create Account</h2>
+              </div>
+              <p class="auth-form-subtitle">Fill in your details to get started</p>
+
+              <div id="role-badge-container"></div>
+
+              <div class="auth-form">
+                <div class="form-group">
+                  <label class="form-label">Full Name *</label>
+                  <div class="input-group">
+                    <span class="input-icon">👤</span>
+                    <input
+                      class="form-input"
+                      type="text"
+                      id="reg-name"
+                      placeholder="Your full name"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address *</label>
+                  <div class="input-group">
+                    <span class="input-icon">📧</span>
+                    <input
+                      class="form-input"
+                      type="email"
+                      id="reg-email"
+                      placeholder="you@college.edu"
+                    />
+                  </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+                  <div class="form-group">
+                    <label class="form-label">Branch *</label>
+                    <input
+                      class="form-input"
+                      type="text"
+                      id="reg-branch"
+                      value="CSE"
+                      readonly
+                      style="background: rgba(255, 255, 255, 0.05); cursor: not-allowed"
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label" id="year-label">Current Year</label>
+                    <select class="form-select" id="reg-year">
+                      <option value="1">1st Year</option>
+                      <option value="2">2nd Year</option>
+                      <option value="3">3rd Year</option>
+                      <option value="4">4th Year</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Password *</label>
+                  <div class="input-group" style="position: relative">
+                    <span class="input-icon">🔒</span>
+                    <input
+                      class="form-input"
+                      type="password"
+                      id="reg-password"
+                      placeholder="Min. 6 characters"
+                    />
+                    <button class="pw-toggle" type="button">👁️</button>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-lg btn-full" id="register-submit">
+                  Create Account 🎉
+                </button>
+              </div>
+
+              <div class="auth-link" style="margin-top: 20px; font-size: 12px">
+                By signing up, you agree to our Terms &amp; Privacy Policy.
+              </div>
             </div>
           </div>
+          <!-- end register-panel -->
         </div>
       </div>
     </div>
@@ -331,43 +659,111 @@
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script>
-      // Sync goto-register link
-      document.getElementById('goto-register')?.addEventListener('click', (e) => {
+      /* ─── Tab switching ─── */
+      const loginTab = document.getElementById('login-tab');
+      const registerTab = document.getElementById('register-tab');
+      const loginPanel = document.getElementById('login-panel');
+      const registerPanel = document.getElementById('register-panel');
+
+      function showLoginPanel() {
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+        loginPanel.style.display = 'block';
+        registerPanel.style.display = 'none';
+      }
+
+      function showRegisterPanel() {
+        registerTab.classList.add('active');
+        loginTab.classList.remove('active');
+        registerPanel.style.display = 'block';
+        loginPanel.style.display = 'none';
+      }
+
+      loginTab.addEventListener('click', showLoginPanel);
+      registerTab.addEventListener('click', showRegisterPanel);
+
+      document.getElementById('goto-login')?.addEventListener('click', (e) => {
         e.preventDefault();
-        document.getElementById('register-tab')?.click();
+        showLoginPanel();
       });
 
-      // Update year label based on role
-      document.querySelectorAll('.role-card').forEach((card) => {
+      document.getElementById('goto-register')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        showRegisterPanel();
+      });
+
+      // Check URL hash
+      if (window.location.hash === '#register') {
+        showRegisterPanel();
+      }
+
+      /* ─── Role Card Selection ─── */
+      window.selectedRole = null;
+      let selectedRole = null;
+      const roleCards = document.querySelectorAll('.role-hero-card');
+      const nextBtn = document.getElementById('role-next-btn');
+
+      roleCards.forEach((card) => {
         card.addEventListener('click', () => {
+          roleCards.forEach((c) => c.classList.remove('selected'));
+          card.classList.add('selected');
+          selectedRole = card.dataset.role;
+          window.selectedRole = selectedRole;
+          nextBtn.disabled = false;
+
+          // Update year dropdown based on role
+          const sel = document.getElementById('reg-year');
           const label = document.getElementById('year-label');
-          if (!label) return;
-          if (card.dataset.role === 'senior') {
+          if (selectedRole === 'senior') {
             label.textContent = 'Year / Batch';
-            const sel = document.getElementById('reg-year');
-            if (sel) {
-              sel.innerHTML =
-                '<option value="2">2nd Year</option>' +
-                '<option value="3">3rd Year</option>' +
-                '<option value="4">4th Year</option>' +
-                '<option disabled style="color:var(--text-muted);font-size:12px">── Graduated ──</option>' +
-                '<option value="2026">Batch 2026</option>' +
-                '<option value="2025">Batch 2025</option>' +
-                '<option value="2024">Batch 2024</option>' +
-                '<option value="2023">Batch 2023</option>' +
-                '<option value="2022">Batch 2022</option>';
-            }
+            sel.innerHTML =
+              '<option value="2">2nd Year</option>' +
+              '<option value="3">3rd Year</option>' +
+              '<option value="4">4th Year</option>' +
+              '<option disabled style="color:var(--text-muted);font-size:12px">── Graduated ──</option>' +
+              '<option value="2026">Batch 2026</option>' +
+              '<option value="2025">Batch 2025</option>' +
+              '<option value="2024">Batch 2024</option>' +
+              '<option value="2023">Batch 2023</option>' +
+              '<option value="2022">Batch 2022</option>';
           } else {
             label.textContent = 'Current Year';
-            const sel = document.getElementById('reg-year');
-            if (sel) {
-              sel.innerHTML =
-                '<option value="1">1st Year</option>' +
-                '<option value="2">2nd Year</option>' +
-                '<option value="3">3rd Year</option>' +
-                '<option value="4">4th Year</option>';
-            }
+            sel.innerHTML =
+              '<option value="1">1st Year</option>' +
+              '<option value="2">2nd Year</option>' +
+              '<option value="3">3rd Year</option>' +
+              '<option value="4">4th Year</option>';
           }
+        });
+      });
+
+      /* ─── Step Navigation ─── */
+      nextBtn.addEventListener('click', () => {
+        if (!selectedRole) return;
+        document.getElementById('step-role').classList.remove('active');
+        document.getElementById('step-details').classList.add('active');
+
+        // Show role badge
+        const badge = document.getElementById('role-badge-container');
+        if (selectedRole === 'junior') {
+          badge.innerHTML = '<div class="selected-role-badge junior">👨‍🎓 Junior Student</div>';
+        } else {
+          badge.innerHTML = '<div class="selected-role-badge senior">🏆 Senior / Alumni</div>';
+        }
+      });
+
+      document.getElementById('back-to-role').addEventListener('click', () => {
+        document.getElementById('step-details').classList.remove('active');
+        document.getElementById('step-role').classList.add('active');
+      });
+
+      /* ─── Password toggles ─── */
+      document.querySelectorAll('.pw-toggle').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const input = btn.previousElementSibling;
+          if (!input) return;
+          input.type = input.type === 'password' ? 'text' : 'password';
+          btn.textContent = input.type === 'password' ? '👁️' : '🙈';
         });
       });
     </script>
