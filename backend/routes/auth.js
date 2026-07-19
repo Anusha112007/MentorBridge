@@ -16,32 +16,43 @@ router.post('/register', async (req, res) => {
     if (!name || !email || !password || !role)
       return res.status(400).json({ error: 'Please provide all required fields' });
 
-    // Find if the email already exists in the database
-    const existingUser = await User.findOne({ email }).select('+password');
-    if (!existingUser) {
-      return res
-        .status(400)
-        .json({ error: 'Only existing/pre-approved emails are allowed to register' });
+    // Check if the user already exists in the database
+    let user = await User.findOne({ email }).select('+password');
+
+    if (user) {
+      // If the email is already registered and verified, block it
+      if (user.isVerified) {
+        return res.status(400).json({ error: 'Email is already registered. Please login.' });
+      }
+
+      // If it exists but is not verified (pre-approved/seeded email):
+      // Update details and set the new password
+      user.name = name;
+      user.password = password; // this will be hashed by the pre-save hook
+      user.role = role;
+      user.currentYear = currentYear;
+      user.graduationYear = graduationYear;
+      user.isVerified = true;
+      user.isActive = true;
+      await user.save();
+    } else {
+      // Create a brand new user
+      user = new User({
+        name,
+        email,
+        password,
+        role,
+        currentYear,
+        graduationYear,
+        isVerified: true,
+        isActive: true,
+      });
+      await user.save();
     }
 
-    // Verify that the password matches the existing user's password
-    const isMatch = await existingUser.matchPassword(password);
-    if (!isMatch) {
-      return res.status(400).json({ error: 'Invalid password for this pre-approved email' });
-    }
-
-    // Update existing user details (activation / registration update)
-    existingUser.name = name;
-    existingUser.role = role;
-    existingUser.currentYear = currentYear;
-    existingUser.graduationYear = graduationYear;
-    existingUser.isVerified = true; // Auto-verify on registration completion
-
-    await existingUser.save();
-
-    const token = signToken(existingUser._id);
-    existingUser.password = undefined;
-    res.status(200).json({ success: true, token, user: existingUser });
+    const token = signToken(user._id);
+    user.password = undefined;
+    res.status(200).json({ success: true, token, user });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -53,29 +64,15 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 
-    let user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      const name = email
-        .split('@')[0]
-        .split(/[._+-]/)
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      const passwordToSave = password.length >= 6 ? password : 'password123';
-      let role = 'junior';
-      if (email.toLowerCase().includes('admin')) {
-        role = 'admin';
-      } else if (email.toLowerCase().includes('senior')) {
-        role = 'senior';
-      }
-      user = new User({
-        name,
-        email,
-        password: passwordToSave,
-        role,
-        isVerified: true,
-        isActive: true,
-      });
-      await user.save();
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Verify that the password matches
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     if (!user.isActive) return res.status(403).json({ error: 'Account is deactivated' });
