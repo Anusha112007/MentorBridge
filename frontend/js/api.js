@@ -59,6 +59,17 @@ const api = {
   putForm: (path, fd) => api.request('PUT', path, fd, true),
 };
 
+// Automatically sync user profile from backend on page load to keep roles/session updated
+if (api.isLoggedIn()) {
+  api.get('/users/me')
+    .then(data => {
+      if (data && data.user) {
+        localStorage.setItem('ec_user', JSON.stringify(data.user));
+      }
+    })
+    .catch(() => {});
+}
+
 /* ── Toast ─────────────────────────────────────────── */
 function showToast(type, title, message = '') {
   let c = document.getElementById('toast-container');
@@ -218,6 +229,7 @@ function renderSidebar(role) {
       <a href="dashboard.html"  class="sidebar-link"><span class="link-icon">🏠</span>Dashboard</a>
       <div class="sidebar-divider"></div>
       ${roleLinks}
+      <a href="mentorship.html" class="sidebar-link" id="sidebar-mentorship-link"><span class="link-icon">🤝</span>Mentorship Requests</a>
       <div class="sidebar-divider"></div>
       <a href="doubts.html"     class="sidebar-link"><span class="link-icon">❓</span>Doubts</a>
       <a href="resources.html"  class="sidebar-link"><span class="link-icon">📚</span>Resources</a>
@@ -403,4 +415,101 @@ window.addEventListener('scroll', () => {
     pollForNewMessages();
     setInterval(pollForNewMessages, 8000);
   }, 3000);
+})();
+
+/* ── Mentorship Request Notification Polling ──────── */
+(function startMentorshipNotifications() {
+  if (!api.isLoggedIn()) return;
+  const user = api.getUser();
+  if (!user || (user.role !== 'junior' && user.role !== 'senior')) return;
+
+  async function pollMentorshipRequests() {
+    if (!api.isLoggedIn()) return;
+    try {
+      const data = await api.get('/mentorship/my-requests');
+      const requests = data.requests || [];
+
+      if (user.role === 'senior') {
+        const pendingRequests = requests.filter(r => r.status === 'pending');
+        updateMentorshipBadge(pendingRequests.length);
+
+        // Track seen pending request IDs
+        let seenPending = {};
+        try {
+          seenPending = JSON.parse(localStorage.getItem('mb_seen_pending_requests') || '{}');
+        } catch (_) {}
+
+        let newDetected = false;
+        pendingRequests.forEach(r => {
+          if (!seenPending[r._id]) {
+            seenPending[r._id] = true;
+            newDetected = true;
+            // Notify senior of the new mentorship request
+            showToast('info', 'New Mentorship Request! 🤝', `${r.junior?.name || 'A junior'} has requested your mentorship.`);
+          }
+        });
+
+        if (newDetected) {
+          localStorage.setItem('mb_seen_pending_requests', JSON.stringify(seenPending));
+        }
+      } else if (user.role === 'junior') {
+        // Track states of junior requests to detect when status changes from pending to accepted/rejected
+        let prevStates = {};
+        try {
+          prevStates = JSON.parse(localStorage.getItem('mb_junior_request_states') || '{}');
+        } catch (_) {}
+
+        let stateChanged = false;
+        requests.forEach(r => {
+          const lastStatus = prevStates[r._id];
+          if (lastStatus && lastStatus !== r.status) {
+            if (r.status === 'accepted') {
+              showToast('success', 'Request Accepted! 🎉', `Senior ${r.senior?.name || 'Mentor'} has accepted your mentorship request.`);
+            } else if (r.status === 'rejected') {
+              showToast('error', 'Request Declined', `Senior ${r.senior?.name || 'Mentor'} has declined your mentorship request.`);
+            }
+          }
+          prevStates[r._id] = r.status;
+          stateChanged = true;
+        });
+
+        if (stateChanged) {
+          localStorage.setItem('mb_junior_request_states', JSON.stringify(prevStates));
+        }
+      }
+    } catch (_e) {
+      /* silent fail for polling errors */
+    }
+  }
+
+  function updateMentorshipBadge(count) {
+    // Remove existing badges first
+    document.querySelectorAll('.mentorship-badge').forEach((b) => b.remove());
+
+    if (count <= 0) return;
+
+    // Add badge to Mentorship Requests sidebar link
+    const link = document.getElementById('sidebar-mentorship-link');
+    if (link) {
+      const badge = document.createElement('span');
+      badge.className = 'mentorship-badge';
+      badge.textContent = count;
+      badge.style.cssText = `
+        background: var(--error, #ef4444);
+        color: #fff;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 800;
+        padding: 2px 6px;
+        margin-left: auto;
+      `;
+      link.appendChild(badge);
+    }
+  }
+
+  // Start polling after 4.5 seconds (offset from message notifications), then every 8 seconds
+  setTimeout(() => {
+    pollMentorshipRequests();
+    setInterval(pollMentorshipRequests, 8000);
+  }, 4500);
 })();
