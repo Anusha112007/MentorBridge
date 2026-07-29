@@ -349,7 +349,7 @@
           const icon = TYPE_ICONS[r.type] || '📦';
           const link = r.url
             ? r.url.startsWith('/uploads')
-              ? 'http://localhost:5000' + r.url
+              ? (typeof SERVER_URL !== 'undefined' ? SERVER_URL : '') + r.url
               : r.url
             : null;
           return `

@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="senior-card" style="display:flex; flex-direction:column; justify-content:space-between">
       <div>
         <div class="senior-card-top" style="align-items:flex-start">
-          ${s.profilePicture ? `<div class="avatar avatar-lg"><img src="http://localhost:5000${s.profilePicture}"></div>` : `<div class="avatar avatar-lg" style="background:var(--gradient-primary);color:#fff;font-weight:700">${initials}</div>`}
+          ${s.profilePicture ? `<div class="avatar avatar-lg"><img src="${typeof SERVER_URL !== 'undefined' ? SERVER_URL : ''}${s.profilePicture}"></div>` : `<div class="avatar avatar-lg" style="background:var(--gradient-primary);color:#fff;font-weight:700">${initials}</div>`}
           <div class="senior-info" style="margin-left: 12px">
             <div class="senior-name" style="font-size: 15px">${s.name}</div>
             <div class="senior-branch" style="font-size: 12px; color:var(--text-muted); margin-top:2px">🎓 ${academicYear}</div>
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       modalBody.innerHTML = `
         <div class="mentor-profile-header">
-          ${m.profilePicture ? `<img src="http://localhost:5000${m.profilePicture}" alt="${m.name}">` : `<div class="mentor-modal-initials">${initials}</div>`}
+          ${m.profilePicture ? `<img src="${typeof SERVER_URL !== 'undefined' ? SERVER_URL : ''}${m.profilePicture}" alt="${m.name}">` : `<div class="mentor-modal-initials">${initials}</div>`}
           <div class="mentor-profile-info">
             <h2 class="mentor-profile-name" style="margin:0">${m.name}</h2>
             <div class="mentor-profile-meta" style="margin-top:4px">🎓 ${academicYear}</div>

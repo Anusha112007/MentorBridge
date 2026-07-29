@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <span class="resource-stat">⬇️ ${r.downloads || 0}</span>
           <span class="resource-stat" style="color:var(--text-muted);font-size:11px">${timeAgo(r.createdAt)}</span>
         </div>
-        <a href="${r.url?.startsWith('/uploads') ? 'http://localhost:5000' + r.url : r.url}" target="_blank"
+        <a href="${r.url?.startsWith('/uploads') ? (typeof SERVER_URL !== 'undefined' ? SERVER_URL : '') + r.url : r.url}" target="_blank"
            class="btn btn-primary btn-sm" onclick="trackDownload('${r._id}')">
           ${r.type === 'pdf' || r.type === 'notes' ? '⬇️ Download' : '🔗 Open'}
         </a>
@@ -224,7 +224,7 @@ async function loadSubjectGuidance() {
                         <div style="font-size:11px;color:var(--text-muted)">${r.uploadedBy?.name || 'Anonymous'} · ${timeAgo(r.createdAt)}</div>
                       </div>
                     </div>
-                    <a href="${r.url?.startsWith('/uploads') ? 'http://localhost:5000' + r.url : r.url}" target="_blank" class="btn btn-primary btn-sm">Open</a>
+                    <a href="${r.url?.startsWith('/uploads') ? (typeof SERVER_URL !== 'undefined' ? SERVER_URL : '') + r.url : r.url}" target="_blank" class="btn btn-primary btn-sm">Open</a>
                   </div>`
                     )
                     .join('')}

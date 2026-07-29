@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="junior-card-top">
         ${
           j.profilePicture
-            ? `<div class="avatar avatar-lg"><img src="http://localhost:5000${j.profilePicture}" alt="${j.name}"></div>`
+            ? `<div class="avatar avatar-lg"><img src="${typeof SERVER_URL !== 'undefined' ? SERVER_URL : ''}${j.profilePicture}" alt="${j.name}"></div>`
             : `<div class="avatar avatar-lg">${getInitials(j.name)}</div>`
         }
         <div class="junior-info">

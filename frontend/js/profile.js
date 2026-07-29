@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <div class="profile-hero">
       <div class="profile-top">
         <div class="profile-avatar">
-          ${u.profilePicture ? `<img src="http://localhost:5000${u.profilePicture}" alt="${u.name}">` : initials}
+          ${u.profilePicture ? `<img src="${typeof SERVER_URL !== 'undefined' ? SERVER_URL : ''}${u.profilePicture}" alt="${u.name}">` : initials}
         </div>
         <div class="profile-meta">
           <h1>${u.name}</h1>
@@ -107,7 +107,7 @@ async function initEditProfile(_user) {
     if (u.profilePicture) {
       const preview = document.getElementById('avatar-preview');
       if (preview) {
-        preview.innerHTML = `<img src="http://localhost:5000${u.profilePicture}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-2xl)">`;
+        preview.innerHTML = `<img src="${typeof SERVER_URL !== 'undefined' ? SERVER_URL : ''}${u.profilePicture}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-2xl)">`;
       }
     }
   } catch (err) {

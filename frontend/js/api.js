@@ -11,7 +11,12 @@
   // If no saved preference, default is dark (the :root defaults)
 })();
 
-const API_BASE = 'http://localhost:5000/api';
+const SERVER_URL = window.SERVER_URL || (
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:5000'
+    : 'https://mentorbridge-backend.onrender.com'
+);
+const API_BASE = `${SERVER_URL}/api`;
 
 const api = {
   getToken: () => localStorage.getItem('ec_token'),
@@ -103,7 +108,7 @@ function getInitials(name) {
 }
 function renderAvatar(user, size = '') {
   if (user?.profilePicture)
-    return `<div class="avatar ${size}"><img src="http://localhost:5000${user.profilePicture}" alt="${user.name}"></div>`;
+    return `<div class="avatar ${size}"><img src="${SERVER_URL}${user.profilePicture}" alt="${user.name}"></div>`;
   return `<div class="avatar ${size}">${getInitials(user?.name)}</div>`;
 }
 function timeAgo(date) {

@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div>
         <div class="msg-content">
           ${m.content || ''}
-          ${m.attachment ? `<div style="margin-top:8px"><a href="http://localhost:5000${m.attachment}" target="_blank" class="btn btn-ghost btn-sm">📎 Attachment</a></div>` : ''}
+          ${m.attachment ? `<div style="margin-top:8px"><a href="${typeof SERVER_URL !== 'undefined' ? SERVER_URL : ''}${m.attachment}" target="_blank" class="btn btn-ghost btn-sm">📎 Attachment</a></div>` : ''}
         </div>
         <div class="msg-time">${timeAgo(m.createdAt)}</div>
       </div>
