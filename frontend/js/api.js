@@ -14,7 +14,7 @@
 const SERVER_URL = window.SERVER_URL || (
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:5000'
-    : 'https://mentorbridge-backend.onrender.com'
+    : 'https://mentorbridge-backend-a3ru.onrender.com'
 );
 const API_BASE = `${SERVER_URL}/api`;
 
