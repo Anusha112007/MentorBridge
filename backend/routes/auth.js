@@ -5,19 +5,30 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const { protect } = require('../middleware/auth');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'mentorbridge_jwt_secret_key_2026_x9k2';
+const JWT_EXPIRE = process.env.JWT_EXPIRE || '7d';
+
 // Generate JWT
 const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+  jwt.sign({ id }, JWT_SECRET, { expiresIn: JWT_EXPIRE });
 
 // @route POST /api/auth/register
 router.post('/register', async (req, res) => {
   try {
-    const { name, email, password, role, currentYear, graduationYear } = req.body;
-    if (!name || !email || !password || !role)
+    const { name, email, password, role, branch, currentYear, graduationYear } = req.body;
+    if (!name || !email || !password || !role) {
       return res.status(400).json({ error: 'Please provide all required fields' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    }
+
+    // Normalize email
+    const normalizedEmail = email.trim().toLowerCase();
 
     // Check if the user already exists in the database
-    let user = await User.findOne({ email }).select('+password');
+    let user = await User.findOne({ email: normalizedEmail }).select('+password');
 
     if (user) {
       // If the email is already registered and verified, block it
@@ -27,21 +38,23 @@ router.post('/register', async (req, res) => {
 
       // If it exists but is not verified (pre-approved/seeded email):
       // Update details and set the new password
-      user.name = name;
+      user.name = name.trim();
       user.password = password; // this will be hashed by the pre-save hook
       user.role = role;
-      user.currentYear = currentYear;
-      user.graduationYear = graduationYear;
+      if (branch) user.branch = branch.trim();
+      if (currentYear) user.currentYear = currentYear;
+      if (graduationYear) user.graduationYear = graduationYear;
       user.isVerified = true;
       user.isActive = true;
       await user.save();
     } else {
       // Create a brand new user
       user = new User({
-        name,
-        email,
+        name: name.trim(),
+        email: normalizedEmail,
         password,
         role,
+        branch: branch ? branch.trim() : undefined,
         currentYear,
         graduationYear,
         isVerified: true,
@@ -52,7 +65,7 @@ router.post('/register', async (req, res) => {
 
     const token = signToken(user._id);
     user.password = undefined;
-    res.status(200).json({ success: true, token, user });
+    res.status(201).json({ success: true, token, user });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -62,9 +75,12 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' });
+    }
 
-    const user = await User.findOne({ email }).select('+password');
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail }).select('+password');
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -75,7 +91,9 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
-    if (!user.isActive) return res.status(403).json({ error: 'Account is deactivated' });
+    if (!user.isActive) {
+      return res.status(403).json({ error: 'Account is deactivated' });
+    }
 
     const token = signToken(user._id);
     user.password = undefined;
@@ -93,8 +111,14 @@ router.get('/me', protect, (req, res) => {
 // @route POST /api/auth/forgot-password
 router.post('/forgot-password', async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) return res.status(404).json({ error: 'No account with that email' });
+    if (!req.body.email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+    const normalizedEmail = req.body.email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      return res.status(404).json({ error: 'No account with that email' });
+    }
 
     const token = crypto.randomBytes(32).toString('hex');
     user.resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');

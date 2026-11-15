@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'mentorbridge_jwt_secret_key_2026_x9k2';
+
 // Verify JWT token
 const protect = async (req, res, next) => {
   let token;
@@ -10,7 +12,7 @@ const protect = async (req, res, next) => {
   if (!token) return res.status(401).json({ error: 'Not authorized, no token' });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = await User.findById(decoded.id).select('-password');
     if (!req.user) return res.status(401).json({ error: 'User not found' });
     next();

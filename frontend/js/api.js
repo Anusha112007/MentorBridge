@@ -11,10 +11,12 @@
   // If no saved preference, default is dark (the :root defaults)
 })();
 
-const SERVER_URL = window.SERVER_URL || (
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+const SERVER_URL = window.SERVER_URL || localStorage.getItem('mb_server_url') || (
+  (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
     ? 'http://localhost:5000'
-    : 'https://mentorbridge-backend-a3ru.onrender.com'
+    : (window.location.hostname.includes('mentorbridge-backend')
+        ? window.location.origin
+        : 'https://mentorbridge-backend-a3ru.onrender.com')
 );
 const API_BASE = `${SERVER_URL}/api`;
 
@@ -44,12 +46,34 @@ const api = {
     if (!isFormData && body) headers['Content-Type'] = 'application/json';
     const opts = { method, headers };
     if (body) opts.body = isFormData ? body : JSON.stringify(body);
-    const res = await fetch(`${API_BASE}${path}`, opts);
-    const data = await res.json();
+
+    let res;
+    try {
+      res = await fetch(`${API_BASE}${path}`, opts);
+    } catch (_netErr) {
+      throw new Error(
+        `Cannot reach server at ${SERVER_URL}. If hosted on Render free tier, the backend may be waking up (typically takes 30-50s). Please try again shortly.`
+      );
+    }
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (_) {
+      data = { error: res.statusText || 'Server error' };
+    }
+
     if (!res.ok) {
-      if (res.status === 401) {
+      if (res.status === 401 && !path.startsWith('/auth/login') && !path.startsWith('/auth/register')) {
         this.clearAuth();
-        window.location.href = 'login.html';
+        if (!window.location.pathname.endsWith('login.html')) {
+          window.location.href = 'login.html';
+        }
+      }
+      if (res.status === 503) {
+        throw new Error(
+          data.error || 'Database connection is temporarily unavailable. Please retry in a few moments.'
+        );
       }
       throw new Error(data.error || 'Request failed');
     }
@@ -122,12 +146,12 @@ function timeAgo(date) {
 /* ── Auth guard ────────────────────────────────────── */
 function requireAuth(allowedRoles = []) {
   if (!api.isLoggedIn()) {
-    window.location.href = '/login.html';
+    window.location.href = 'login.html';
     return null;
   }
   const user = api.getUser();
   if (allowedRoles.length && !allowedRoles.includes(user?.role)) {
-    window.location.href = '/login.html';
+    window.location.href = 'login.html';
     return null;
   }
   return user;

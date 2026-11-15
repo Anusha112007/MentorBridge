@@ -1,16 +1,131 @@
 const mongoose = require('mongoose');
 
-const connectDB = async () => {
+const maskUri = (uri) => {
+  if (!uri || typeof uri !== 'string') return 'none';
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI || process.env.MONGODB_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (err) {
-    console.error(`❌ MongoDB Connection Error: ${err.message}`);
-    console.error(
-      '⚠️  Server running without database. Start MongoDB locally or update MONGO_URI in .env'
-    );
-    // Don't exit — allow server to run (API calls will fail gracefully)
+    return uri.replace(/\/\/(.*?):(.*?)@/, '//***:***@');
+  } catch (_e) {
+    return 'configured (masked)';
   }
 };
 
-module.exports = connectDB;
+let dbStatus = {
+  connected: false,
+  host: null,
+  databaseName: null,
+  error: null,
+  uriConfigured: false,
+  uriType: 'none',
+  maskedUri: 'none',
+  lastConnectedAt: null,
+  lastAttemptAt: null,
+  reconnectAttempts: 0,
+};
+
+let reconnectTimer = null;
+let isConnecting = false;
+
+const readyStateMap = {
+  0: 'disconnected',
+  1: 'connected',
+  2: 'connecting',
+  3: 'disconnecting',
+};
+
+// Listen to connection lifecycle events
+mongoose.connection.on('connected', () => {
+  dbStatus.connected = true;
+  dbStatus.host = mongoose.connection.host;
+  dbStatus.databaseName = mongoose.connection.name;
+  dbStatus.error = null;
+  dbStatus.lastConnectedAt = new Date().toISOString();
+  if (reconnectTimer) {
+    clearInterval(reconnectTimer);
+    reconnectTimer = null;
+  }
+  console.log(`✅ MongoDB Connected: ${mongoose.connection.host} (${mongoose.connection.name})`);
+});
+
+mongoose.connection.on('disconnected', () => {
+  dbStatus.connected = false;
+  console.warn('⚠️  MongoDB disconnected. Initiating background reconnect...');
+  scheduleReconnect();
+});
+
+mongoose.connection.on('error', (err) => {
+  dbStatus.connected = false;
+  dbStatus.error = err.message;
+  console.error(`❌ MongoDB Connection Error: ${err.message}`);
+});
+
+const scheduleReconnect = () => {
+  if (reconnectTimer || mongoose.connection.readyState === 1 || isConnecting) return;
+  reconnectTimer = setInterval(async () => {
+    if (mongoose.connection.readyState === 1) {
+      clearInterval(reconnectTimer);
+      reconnectTimer = null;
+      return;
+    }
+    console.log('🔄 Attempting MongoDB reconnection...');
+    dbStatus.reconnectAttempts += 1;
+    await connectDB();
+  }, 10000);
+};
+
+const connectDB = async () => {
+  if (mongoose.connection.readyState === 1 || isConnecting) return;
+
+  const envUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+  const uri = envUri || 'mongodb://127.0.0.1:27017/mentorbridge';
+
+  dbStatus.uriConfigured = Boolean(envUri);
+  dbStatus.uriType = uri.startsWith('mongodb+srv://')
+    ? 'atlas'
+    : uri.includes('127.0.0.1') || uri.includes('localhost')
+      ? 'local'
+      : 'remote';
+  dbStatus.maskedUri = maskUri(uri);
+  dbStatus.lastAttemptAt = new Date().toISOString();
+
+  isConnecting = true;
+  try {
+    const conn = await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 8000,
+    });
+    dbStatus.connected = true;
+    dbStatus.host = conn.connection.host;
+    dbStatus.databaseName = conn.connection.name;
+    dbStatus.error = null;
+    dbStatus.lastConnectedAt = new Date().toISOString();
+    if (reconnectTimer) {
+      clearInterval(reconnectTimer);
+      reconnectTimer = null;
+    }
+    console.log(`✅ MongoDB Connected: ${conn.connection.host} (${conn.connection.name})`);
+  } catch (err) {
+    dbStatus.connected = false;
+    dbStatus.error = err.message;
+    console.error(`❌ MongoDB Connection Error: ${err.message}`);
+    if (dbStatus.uriType === 'atlas') {
+      console.warn(
+        '⚠️  If this is a free Atlas (M0) cluster, verify it is not paused (auto-pauses after 30 days) and that Network Access allows 0.0.0.0/0.'
+      );
+    } else {
+      console.warn('⚠️  Server running without database. Ensure MongoDB is running locally or set MONGO_URI in .env');
+    }
+    scheduleReconnect();
+  } finally {
+    isConnecting = false;
+  }
+};
+
+const getDbStatus = () => {
+  const readyState = mongoose.connection.readyState;
+  return {
+    ...dbStatus,
+    readyState,
+    readyStateString: readyStateMap[readyState] || 'unknown',
+  };
+};
+
+module.exports = { connectDB, getDbStatus };
