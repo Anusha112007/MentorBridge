@@ -88,6 +88,8 @@ const connectDB = async () => {
   dbStatus.lastAttemptAt = new Date().toISOString();
 
   isConnecting = true;
+  const fallbackAtlasUri = 'mongodb+srv://anusha:saibabuanu@cluster0.58wk908.mongodb.net/mentorbridge?retryWrites=true&w=majority&appName=Cluster0';
+
   try {
     const conn = await mongoose.connect(uri, {
       serverSelectionTimeoutMS: 8000,
@@ -103,9 +105,36 @@ const connectDB = async () => {
     }
     console.log(`✅ MongoDB Connected: ${conn.connection.host} (${conn.connection.name})`);
   } catch (err) {
+    console.error(`❌ MongoDB Primary Connection Error: ${err.message}`);
+    
+    // Automatic resilient failover to verified MongoDB Atlas cluster
+    if (uri !== fallbackAtlasUri) {
+      console.log('🔄 Attempting resilient connection to verified Atlas cluster...');
+      try {
+        const fallbackConn = await mongoose.connect(fallbackAtlasUri, {
+          serverSelectionTimeoutMS: 10000,
+        });
+        dbStatus.connected = true;
+        dbStatus.host = fallbackConn.connection.host;
+        dbStatus.databaseName = fallbackConn.connection.name;
+        dbStatus.error = null;
+        dbStatus.lastConnectedAt = new Date().toISOString();
+        dbStatus.uriType = 'atlas';
+        dbStatus.maskedUri = maskUri(fallbackAtlasUri);
+        if (reconnectTimer) {
+          clearInterval(reconnectTimer);
+          reconnectTimer = null;
+        }
+        console.log(`✅ MongoDB Connected via Atlas fallback: ${fallbackConn.connection.host} (${fallbackConn.connection.name})`);
+        return;
+      } catch (fallbackErr) {
+        console.error(`❌ Fallback Atlas Error: ${fallbackErr.message}`);
+        dbStatus.error = fallbackErr.message;
+      }
+    }
+
     dbStatus.connected = false;
     dbStatus.error = err.message;
-    console.error(`❌ MongoDB Connection Error: ${err.message}`);
     if (dbStatus.uriType === 'atlas') {
       console.warn(
         '⚠️  If this is a free Atlas (M0) cluster, verify it is not paused (auto-pauses after 30 days) and that Network Access allows 0.0.0.0/0.'

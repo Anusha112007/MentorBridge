@@ -19,16 +19,20 @@ async function runTests() {
     process.stderr.write('[server-err] ' + d.toString());
   });
 
-  // Wait until server logs ready or timeout after 5s
-  await new Promise((resolve) => {
-    const timeout = setTimeout(resolve, 5000);
-    proc.stdout.on('data', (d) => {
-      if (d.toString().includes('MentorBridge Server running')) {
-        clearTimeout(timeout);
-        setTimeout(resolve, 500);
+  // Wait until server and database are ready
+  const healthCheckUrl = `http://127.0.0.1:${TEST_PORT}/api/health`;
+  let dbReady = false;
+  for (let i = 0; i < 20; i++) {
+    try {
+      const hRes = await fetch(healthCheckUrl);
+      const hData = await hRes.json();
+      if (hData?.database?.readyState === 1) {
+        dbReady = true;
+        break;
       }
-    });
-  });
+    } catch (_e) {}
+    await new Promise((r) => setTimeout(r, 500));
+  }
 
   const base = `http://127.0.0.1:${TEST_PORT}/api`;
   let passed = 0;
